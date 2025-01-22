@@ -43,7 +43,7 @@
 /* Styling for the pet container */
 .pet-container {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-around;
     background-color: #0f0f0f; /* Dark background color */
     border-radius: 8px; /* Slightly rounded edges */
     border: 1px solid #53575f; /* 1px border with #53575f color */
@@ -58,7 +58,7 @@
 .obtained-pet-icon {
     width: 40px; /* Set width of the box to 40px */
     height: 40px; /* Set height of the box to 40px */
-    background: linear-gradient(135deg, #492023, #463827); /* Diagonal gradient from #492023 to #463827 */
+    background: linear-gradient(135deg, #492023, #463827);
     border-radius: 8px; /* Rounded corners */
     overflow: hidden; /* Ensures the image stays within the rounded box */
     display: flex;

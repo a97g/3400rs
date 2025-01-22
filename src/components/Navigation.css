@@ -83,17 +83,13 @@
   .sidenav-nav .sidenav-nav-item .sidenav-nav-link .sidenav-link-text {
     margin-left: 1.5rem;
   }
-  .sidenav-nav .sidenav-nav-item:hover .sidenav-nav-link {
-    background-color: red;
-    color: #000;
-  }
   
   .active {
-    background-color: #fff;
-  }
-  .active .sidenav-link-icon,
-  .active .sidenav-link-text {
-    color: #000;
+    border-color: orange;
+    box-shadow: 0 0 15px orange;
+    text-decoration: none;
+    color: orange;
+    background-color: transparent;
   }
   .nav-space-divider {
     height: 1px;
@@ -125,15 +121,15 @@
     align-items: center;
     flex-direction: column; /* To align icon and text vertically */
     text-decoration: none;
-    color: #fff; /* Default color */
+    color: #fff;
   }
   
   .menu-item:hover {
-    color: orange; /* Text color change on hover */
+    color: orange; 
   }
   
   .menu-item .MuiSvgIcon-root {
-    font-size: 29px; /* Adjust the size of the icon */
+    font-size: 29px;
     color: #fff;
   }
   
