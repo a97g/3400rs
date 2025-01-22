@@ -28,24 +28,29 @@ export default function PetLeaderboard({ petCounts }: PetLeaderboardProps) {
   const remaining = Object.values(petCounts).sort((a, b) => a.rank - b.rank).slice(3);
 
   return (
-    <Box sx={{ p: 2}}>
+    <Box className="leaderboard-container" sx={{ p: 2, flexGrow: 1}}>
       <Grid container spacing={2}>
-        {topThree.map((petCount, index) => (
+        {topThree.length > 1 && topThree.map((petCount, index) => (
           <Grid item xs={12} md={4} key={index}>
             <Box sx={{ backgroundColor: '#1b1a1d', padding: 2, borderRadius: 2, position: 'relative' }}>
               <Typography variant="h6" sx={{ position: 'absolute', top: 8, left: 8 }}>
-                {petCount.rank}. {petCount.player}
+                {petCount.rank}
               </Typography>
               <img src={trophyImages[index]} alt="trophy" style={{ position: 'absolute', top: 0, right: 0, width: '150px', height: '150px', zIndex: '0' }} />
-              <Typography variant="h4" sx={{ textAlign: 'center', marginTop: 4,zIndex: '99' }}>
-                {petCount.pet_count} / 62
+              <Typography variant="h4" sx={{ textAlign: 'center', marginTop: 4, zIndex: '99' }}>
+                {petCount.player}
               </Typography>
-              <Typography variant="body2" sx={{ textAlign: 'center', marginTop: 2,zIndex: '99' }}>
-                {petCount.pet_hours} hours
-              </Typography>
-              <Typography variant="body2" sx={{ textAlign: 'center', marginTop: 1,zIndex: '99' }}>
-                {62 - petCount.pet_count} missing
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, zIndex: '99' }}>
+                <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                  {petCount.pet_count} / 62
+                </Typography>
+                <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                  {petCount.pet_hours} hours
+                </Typography>
+                <Typography variant="body2" sx={{ textAlign: 'center' }}>
+                  {62 - petCount.pet_count} missing
+                </Typography>
+              </Box>
             </Box>
           </Grid>
         ))}

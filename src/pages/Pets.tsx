@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState } from 'react';
-import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Switch } from '@mui/material';
 import Page from '../components/Page';
 import axios from 'axios';
 import { Help, Search } from '@mui/icons-material';
@@ -13,8 +13,10 @@ import PetLeaderboard from '../components/PetLeaderboard';
 export default function Pets() {
   const [group, setGroup] = useState('2394');
   const [player, setPlayer] = useState('3400');
+  const [missingMode, setMissingMode] = useState(false);
   const [isGroup, setIsGroup] = useState(false);
   const [isLeaderboard, setIsLeaderboard] = useState(false);
+  const [isDetailed, setIsDetailed] = useState(false);
   
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const [petCounts, setPetCounts] = useState<{ [key: string]: PetCountResponse }>({ '': emptyPets });
@@ -54,16 +56,33 @@ export default function Pets() {
   return (
     <Page title="Pet List Generator | 34rs">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-        <Box sx={{ backgroundColor: '#1b1a1d', width: '300px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
+        <Box sx={{ backgroundColor: '#1b1a1d', width: '304px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1 }}>
             <Typography variant="h4" sx={{ textAlign: 'center', mt: 3 }}>List Settings</Typography>
             <div className="nav-space-divider" />
-            <Button variant="contained" onClick={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false);}} className='setting-button' sx={{ mb: 3 }}>Individual Pets</Button>
-            <Button variant="contained" className='setting-button' disabled={isGroup ? true : false}>Missing Mode</Button>
+            <Button variant="contained" onClick={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false);}} className='setting-button' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              Individual Pets
+              <Switch checked={!isGroup} onChange={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false); }} color="default" />
+            </Button>
+            <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              Missing Mode
+              <Switch checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default" />
+            </Button>
             <div className="nav-space-divider" />
-            <Button variant="contained" onClick={() => { setIsGroup(true); setPetCounts({ '': emptyPets }) }} className='setting-button' sx={{ mb: 3 }}>Group / Clan Pets</Button>
-            <Button variant="contained" onClick={() => { setIsLeaderboard(true); }} className='setting-button' disabled={!isGroup ? true : false}>Leaderboard Mode</Button>
+            <Button variant="contained" onClick={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); }} className='setting-button' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              Group / Clan Pets
+              <Switch checked={isGroup} onChange={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); }} color="default" />
+            </Button>
+            <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); }} className='setting-button' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              Leaderboard Mode
+              <Switch checked={isLeaderboard} onChange={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); }} color="default" />
+            </Button>
             <div className="nav-space-divider" />
+            <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              Detailed Sprite Mode
+              <Switch checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default" />
+            </Button>
+
             <Button variant="contained" className='setting-button'>Pet Background Color</Button>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1 }}>
@@ -120,7 +139,8 @@ export default function Pets() {
             </Box>
           </Box>
           <div className="nav-space-divider" />
-          {!isLeaderboard && (<PetTable petCounts={petCounts} isGroup={isGroup} />)}
+          <Box sx={{minWidth: '1400px'}}></Box>
+          {!isLeaderboard && (<PetTable petCounts={petCounts} isGroup={isGroup} missingMode={missingMode} detailedMode={isDetailed}/>)}
           {isLeaderboard && (<PetLeaderboard petCounts={petCounts}/>)}
         </Container>
       </Box>

@@ -34,6 +34,11 @@
     filter: grayscale(0%); /* Remove the grayscale effect when hovered */
 }
 
+.detailed-pet-image {
+    max-height: 38px;
+    max-width: 33px;
+}
+
 /* Style the pet grid typography */
 .pet-grid > .MuiTypography-root {
     font-weight: bold;
@@ -52,6 +57,10 @@
     gap: 1em 2em;
     margin-top: 1em;
     margin-bottom: 1em;
+}
+
+.leaderboard-container {
+    width: auto;
 }
 
 /* Styling for obtained pet icon container */
