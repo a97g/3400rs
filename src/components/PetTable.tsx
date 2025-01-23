@@ -21,6 +21,8 @@ interface PetCountResponse {
 }
 
 interface PetTableProps {
+  totalPets: number;
+  totalHours: number;
   petCounts: { [key: string]: PetCountResponse };
   isGroup: boolean;
   missingMode: boolean;
@@ -29,9 +31,8 @@ interface PetTableProps {
   manualMode: boolean;
 }
 
-export default function PetTable({ petCounts, isGroup, missingMode, detailedMode, combinedMissing, manualMode }: PetTableProps) {
-  const totalPets = 62;
-  const totalHours = 5270;
+export default function PetTable({ totalPets, totalHours, petCounts, isGroup, missingMode, detailedMode, combinedMissing, manualMode }: PetTableProps) {
+
   const [manualPets, setManualPets] = useState<PetCountResponse>({
     pet_count: 0,
     pet_hours: 0,
@@ -175,7 +176,7 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
             <Box sx={{display: 'flex', position: 'relative'}}>
               <div style={{ height: "170px", width: "200px" }}>
                 {petCount.rank <= 3 && (
-                  <img src={getTrophyImage(petCount.rank) || ''} alt="trophy" style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '150px', zIndex: '0' }} />
+                  <img src={getTrophyImage(petCount.rank) || silverTrophy} alt="trophy" style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '150px', zIndex: '0' }} />
                 )}
               <Typography variant="h6" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>Rank</Typography>
               <Typography variant="h1" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>{petCount.rank}</Typography>

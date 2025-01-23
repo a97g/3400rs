@@ -50,6 +50,9 @@ export default function GlobalStyles() {
               }
             }
           },
+          '&::-webkit-scrollbar': {
+            scrollbarWidth: 'thin',
+          },
           textarea: {
             '&::-webkit-input-placeholder': {
               color: theme.palette.text.disabled

@@ -12,6 +12,9 @@ import PetLeaderboard from '../components/PetLeaderboard';
 import AsciiGenerator from '../components/AsciiGenerator';
 
 export default function Pets() {
+  const totalPets = 62;
+  const totalHours = 5270;
+
   const [group, setGroup] = useState('2394');
   const [player, setPlayer] = useState('3400');
   const [missingMode, setMissingMode] = useState(false);
@@ -297,6 +300,8 @@ export default function Pets() {
           {/* <Box sx={{minWidth: '1400px'}}></Box> */}
           {!isLeaderboard && !asciiGen && (
             <PetTable 
+              totalPets={totalPets}
+              totalHours={totalHours}
               petCounts={petCounts} 
               isGroup={isGroup} 
               missingMode={missingMode} 
@@ -306,7 +311,10 @@ export default function Pets() {
           )}
           {isLeaderboard && !asciiGen && (
             <PetLeaderboard 
-            petCounts={petCounts}/>
+              totalPets={totalPets}
+              totalHours={totalHours}
+              petCounts={petCounts}
+            />
           )}
           {asciiGen && (
             <AsciiGenerator discordFormat={discordFormatting} importedTable={importedTable} />
