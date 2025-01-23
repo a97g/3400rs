@@ -4,6 +4,9 @@ import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import * as InvyPet from '../resources/pets/inv';
 import * as DetailedPet from '../resources/pets/detailed';
+import goldTrophy from '../resources/pets/assets/goldped.png';
+import silverTrophy from '../resources/pets/assets/silverped.png';
+import bronzeTrophy from '../resources/pets/assets/bronzeped.png';
 
 interface PetData {
   [key: string]: number;
@@ -125,6 +128,13 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
     return renderPetGrid(category, obtainedPets, pets);
   };
 
+  const getTrophyImage = (rank: number) => {
+    if (rank === 1) return goldTrophy;
+    if (rank === 2) return silverTrophy;
+    if (rank === 3) return bronzeTrophy;
+    return null;
+  };
+
   return (
     <Box sx={{ p: '24px'}}>
     {Object.keys(petCounts).length > 0 && (
@@ -162,22 +172,13 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
 
           {isGroup && (
           <Grid size={{xs: 4}} sx={{display: 'flex', justifyContent: 'center'}}>
-            <Box sx={{display: 'flex'}}>
-              <div style={{ height: "160px", width: "120px" }}>
-                <CircularProgressbar 
-                value={petCount.rank / Object.keys(petCounts).length }
-                maxValue={1}
-                text={`${petCount.rank}`}
-                styles={buildStyles({
-                  strokeLinecap: 'round',
-                  pathTransitionDuration: 3,
-
-                  // Colors
-                  pathColor: `grey`,
-                  textColor: 'grey',
-                  trailColor: '#181818',
-                })} />
-              <Typography variant="h6" sx={{textAlign: 'center'}}>Group Rank</Typography>
+            <Box sx={{display: 'flex', position: 'relative'}}>
+              <div style={{ height: "170px", width: "200px" }}>
+                {petCount.rank <= 3 && (
+                  <img src={getTrophyImage(petCount.rank) || ''} alt="trophy" style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '150px', zIndex: '0' }} />
+                )}
+              <Typography variant="h6" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>Rank</Typography>
+              <Typography variant="h1" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>{petCount.rank}</Typography>
               </div>
             </Box>
           </Grid>
