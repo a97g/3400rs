@@ -1,9 +1,9 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState } from 'react';
-import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField } from '@mui/material';
 import Page from '../components/Page';
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, TerrainOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import './Pets.css';
@@ -24,8 +24,9 @@ export default function Pets() {
   const [petBgColor2, setPetBgColor2] = useState('#463827');
   const [asciiGen, setAsciiGen] = useState(false);
   const [discordFormatting, setDiscordFormatting] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importedTable, setImportedTable] = useState('');
 
-  
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const [petCounts, setPetCounts] = useState<{ [key: string]: PetCountResponse }>({ '': emptyPets });
 
@@ -103,6 +104,35 @@ export default function Pets() {
     }
   };
 
+  const handleImportDialogOpen = () => {
+    setImportDialogOpen(true);
+  };
+
+  const handleImportDialogClose = () => {
+    setImportDialogOpen(false);
+  };
+
+  const handleImportTableChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setImportedTable(event.target.value);
+  };
+
+  const handleImportTable = () => {
+    // Process the imported table and populate the fields in AsciiGenerator
+    // Strip unneeded spaces and ASCII characters
+    const lines = importedTable.split('\n').filter(line => line.trim() !== '');
+    const rsn = lines[1].trim();
+    const rows = lines.slice(4, -1).map(line => {
+      const [index, pet, kc, date] = line.split('|').map(item => item.trim());
+      return { id: parseInt(index), pet, kc, date };
+    });
+
+    // Set the RSN and rows in AsciiGenerator
+    setRsn(rsn);
+    setRows(rows);
+
+    setImportDialogOpen(false);
+  };
+
   return (
     <Page title="Pet List Generator | 34rs">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -175,11 +205,16 @@ export default function Pets() {
               </>
             )}
             {asciiGen && (
-              <Button variant="contained" onClick={() => { setDiscordFormatting(!discordFormatting); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-                <ContentPasteGoOutlined />
-                Discord Formatting
-                <Checkbox checked={discordFormatting} onChange={() => { setDiscordFormatting(!discordFormatting); }} color="default"/>
-              </Button>
+              <>
+                <Button variant="contained" onClick={() => { setDiscordFormatting(!discordFormatting); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                  <ContentPasteGoOutlined />
+                  Discord Formatting
+                  <Checkbox checked={discordFormatting} onChange={() => { setDiscordFormatting(!discordFormatting); }} color="default"/>
+                </Button>
+                <Button variant="contained" onClick={handleImportDialogOpen} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center' }} >
+                  Import Old Table
+                </Button>
+              </>
             )}
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1 }}>
@@ -274,10 +309,43 @@ export default function Pets() {
             petCounts={petCounts}/>
           )}
           {asciiGen && (
-            <AsciiGenerator discordFormat={discordFormatting}/>
+            <AsciiGenerator discordFormat={discordFormatting} importedTable={importedTable} />
           )}
         </Container>
       </Box>
+
+      <Dialog open={importDialogOpen} onClose={handleImportDialogClose}>
+        <DialogTitle>Import Old Table</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Paste your old ASCII table below to import it.
+          </DialogContentText>
+          <MuiTextField
+            autoFocus
+            margin="dense"
+            id="importedTable"
+            label="Old ASCII Table"
+            type="text"
+            fullWidth
+            multiline
+            rows={10}
+            value={importedTable}
+            onChange={handleImportTableChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleImportDialogClose}>Close</Button>
+          {/* <Button onClick={handleImportTable}>Import</Button> */}
+        </DialogActions>
+      </Dialog>
     </Page>
   );
 }
+function setRows(rows: { id: number; pet: string; kc: string; date: string; }[]) {
+  throw new Error('Function not implemented.');
+}
+
+function setRsn(rsn: string) {
+  throw new Error('Function not implemented.');
+}
+

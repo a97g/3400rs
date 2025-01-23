@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, TextField, Typography, Button, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridRowsProp, GridRowModesModel, GridRowModes, GridActionsCellItem, GridRowId } from '@mui/x-data-grid';
 import { Edit, Save, Cancel, Add } from '@mui/icons-material';
@@ -14,12 +14,18 @@ const petList = [
   "Butch", "Lil'viathan", "Baron", "Scurry", "Smol heredit", "Quetzin", "Nid", "Huberte", "Moxi"
 ];
 
-export default function AsciiGenerator({ discordFormat }: { discordFormat: boolean }) {
+export default function AsciiGenerator({ discordFormat, importedTable }: { discordFormat: boolean, importedTable: string }) {
   const [rsn, setRsn] = useState('');
   const [rows, setRows] = useState<GridRowsProp>([]);
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [asciiTable, setAsciiTable] = useState('');
   const [availablePets, setAvailablePets] = useState(petList);
+
+  useEffect(() => {
+    if (importedTable) {
+      handleImportAsciiTable(importedTable);
+    }
+  }, [importedTable]);
 
   const handleRowEditStart = (params: any, event: any) => {
     event.defaultMuiPrevented = true;
@@ -111,11 +117,11 @@ export default function AsciiGenerator({ discordFormat }: { discordFormat: boole
 
     rows.forEach((row, index) => {
       table += `
-║ ${String(index + 1)}. ${row.pet.padEnd(15 - row.pet.length)} ║ ${row.kc.padEnd(14)} ║ ${formatDate(String(row.date)).padEnd(20)} ║`;
+║ ${String(index + 1)}. ${row.pet?.padEnd(15 - row.pet.length)} ║ ${row.kc?.padEnd(14)} ║ ${formatDate(String(row.date))?.padEnd(20)} ║`;
     });
 
     table += `
-╚═════════════════════════╩════════════════╩═════════════════════╝`;
+╚═════════════════════════╩════════════════╩══════════════════════╝`;
 
     if (discordFormat) {
       table = `\`\`\`asciidoc\n${table}\n\`\`\``;
@@ -123,6 +129,19 @@ export default function AsciiGenerator({ discordFormat }: { discordFormat: boole
 
     setAsciiTable(table);
     navigator.clipboard.writeText(table);
+  };
+
+  const handleImportAsciiTable = (ascii: string) => {
+    const lines = ascii.split('\n').filter(line => !/[═╗╣╦╔╠╚╩╝]/.test(line.trim()));
+    const rsnLine = lines[1].trim();
+    const rsn = rsnLine.substring(1, rsnLine.length - 1).trim();
+    const newRows = lines.slice(5, -1).map((line, index) => {
+      const [indexStr, pet, kc, date] = line.split('║').map(cell => cell.trim());
+      return { id: index + 1, pet, kc, date: new Date(date), isNew: false };
+    });
+    setRsn(rsn);
+    setRows(newRows);
+    setAvailablePets(petList.filter(pet => !newRows.some(row => row.pet === pet)));
   };
 
   return (
