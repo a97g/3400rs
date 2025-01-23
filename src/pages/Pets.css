@@ -118,3 +118,15 @@
 .setting-button {
     background-color: #242328 !important;
 }
+
+.MuiCheckbox-root {
+    color: #242328; /* Unchecked color */
+  }
+  
+  .MuiCheckbox-root.Mui-checked {
+    color: green; /* Checked color */
+  }
+  
+  .MuiCheckbox-root.MuiCheckbox-indeterminate {
+    color: orange; /* Indeterminate color */
+  }

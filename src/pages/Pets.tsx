@@ -1,9 +1,9 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState } from 'react';
-import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Switch } from '@mui/material';
+import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox } from '@mui/material';
 import Page from '../components/Page';
 import axios from 'axios';
-import { Help, Search } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import './Pets.css';
@@ -17,6 +17,8 @@ export default function Pets() {
   const [isGroup, setIsGroup] = useState(false);
   const [isLeaderboard, setIsLeaderboard] = useState(false);
   const [isDetailed, setIsDetailed] = useState(false);
+  const [combinedMissing, setCombinedMissing] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
   
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const [petCounts, setPetCounts] = useState<{ [key: string]: PetCountResponse }>({ '': emptyPets });
@@ -53,6 +55,15 @@ export default function Pets() {
     }
   };
 
+  const handleManualModeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const newPlayer = event.target.value;
+    setPlayer(newPlayer);
+    if (manualMode) {
+      const newPetCount: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: newPlayer, rank: 0 };
+      setPetCounts({ '': newPetCount });
+    }
+  };
+
   return (
     <Page title="Pet List Generator | 34rs">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -61,29 +72,49 @@ export default function Pets() {
             <Typography variant="h4" sx={{ textAlign: 'center', mt: 3 }}>List Settings</Typography>
             <div className="nav-space-divider" />
             <Button variant="contained" onClick={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false);}} className='setting-button' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              Individual Pets
-              <Switch checked={!isGroup} onChange={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false); }} color="default" />
+              <PersonOutlined />
+              Individual RSN
+              <Checkbox checked={!isGroup} onChange={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false); }} color="default" className="settings-toggle"/>
             </Button>
-            <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              Missing Mode
-              <Switch checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default" />
+            <Button variant="contained" onClick={() => { setManualMode(!manualMode); }} className='setting-button settings-toggle' disabled={isGroup ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+              <PanToolAltOutlined />
+              Manual Mode
+              <Checkbox checked={manualMode} onChange={() => { setManualMode(!manualMode); }} color="default"/>
+            </Button>
+            <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <SentimentDissatisfiedOutlined />
+              Only Missing
+              <Checkbox checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default"className="settings-toggle" />
+            </Button>
+            <Button variant="contained" onClick={() => { setCombinedMissing(!combinedMissing);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <JoinFull />
+              Combine Missing
+              <Checkbox checked={combinedMissing} onChange={() => setCombinedMissing(!combinedMissing)} color="default" className="settings-toggle"/>
             </Button>
             <div className="nav-space-divider" />
-            <Button variant="contained" onClick={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); }} className='setting-button' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              Group / Clan Pets
-              <Switch checked={isGroup} onChange={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); }} color="default" />
+            <Button variant="contained" onClick={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <GroupsOutlined />
+              Group / Clan
+              <Checkbox checked={isGroup} onChange={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); setManualMode(false);}} color="default" className="settings-toggle"/>
             </Button>
-            <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); }} className='setting-button' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); }} className='setting-button settings-toggle' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+              <LeaderboardOutlined />
               Leaderboard Mode
-              <Switch checked={isLeaderboard} onChange={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); }} color="default" />
+              <Checkbox checked={isLeaderboard} onChange={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); setCombinedMissing(false); }} color="default" className="settings-toggle"/>
             </Button>
             <div className="nav-space-divider" />
-            <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              Detailed Sprite Mode
-              <Switch checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default" />
+            <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+              <DetailsOutlined />
+              Detailed Sprites
+              <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
             </Button>
 
-            <Button variant="contained" className='setting-button'>Pet Background Color</Button>
+            <Button variant="contained" className='setting-button' sx={{mb: 3}}>Include Dusts?</Button>
+
+
+            <Button variant="contained" className='setting-button' sx={{mb: 3}}>Pet Background Color</Button>
+            <Button variant="contained" className='setting-button'>Ascii Table Generator</Button>
+
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1 }}>
             <Box>
@@ -130,7 +161,7 @@ export default function Pets() {
                   placeholder={isGroup ? "Temple Group Id" : "RuneScape Username"}
                   inputProps={{ 'aria-label': 'RuneScape Username' }}
                   value={isGroup ? group : player}
-                  onChange={(event) => isGroup ? setGroup(event.target.value) : setPlayer(event.target.value)}
+                  onChange={(event) => isGroup ? setGroup(event.target.value) : handleManualModeChange(event)}
                 />
                 <IconButton type="button" sx={{ p: '10px', color: 'orange' }} aria-label="search" onClick={getPetCount}>
                   <Search />
@@ -140,7 +171,7 @@ export default function Pets() {
           </Box>
           <div className="nav-space-divider" />
           <Box sx={{minWidth: '1400px'}}></Box>
-          {!isLeaderboard && (<PetTable petCounts={petCounts} isGroup={isGroup} missingMode={missingMode} detailedMode={isDetailed}/>)}
+          {!isLeaderboard && (<PetTable petCounts={petCounts} isGroup={isGroup} missingMode={missingMode} detailedMode={isDetailed} combinedMissing={combinedMissing} manualMode={manualMode}/>)}
           {isLeaderboard && (<PetLeaderboard petCounts={petCounts}/>)}
         </Container>
       </Box>

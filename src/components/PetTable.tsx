@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
@@ -22,15 +22,29 @@ interface PetTableProps {
   isGroup: boolean;
   missingMode: boolean;
   detailedMode: boolean;
+  combinedMissing: boolean;
+  manualMode: boolean;
 }
 
-export default function PetTable({ petCounts, isGroup, missingMode, detailedMode }: PetTableProps) {
-    const totalPets = 62;
-    const totalHours = 5270;
+export default function PetTable({ petCounts, isGroup, missingMode, detailedMode, combinedMissing, manualMode }: PetTableProps) {
+  const totalPets = 62;
+  const totalHours = 5270;
+  const [manualPets, setManualPets] = useState<PetData>({});
 
   const getPetIconClass = (petName: string, pets: PetData) => {
+    if (manualMode) {
+      return manualPets[petName] ? 'obtained-pet-icon' : 'pet-icon';
+    }
     return Object.entries(pets).find(([name, count]) => name === petName && count === 1)
-    ? 'obtained-pet-icon':'pet-icon';
+      ? 'obtained-pet-icon'
+      : 'pet-icon';
+  };
+
+  const handlePetClick = (petName: string) => {
+    setManualPets(prevState => ({
+      ...prevState,
+      [petName]: prevState[petName] ? 0 : 1
+    }));
   };
 
   const renderPetBox = (petName: string, pets: PetData) => {
@@ -39,18 +53,48 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
       return null;
     }
     const formatPetName = (name: string) => {
-        return name.replace(/['-.]/g, '').replace(/\b\w/g, char => char.toUpperCase()).replace(/\s+/g, '');
-      };
+      return name.replace(/['-.]/g, '').replace(/\b\w/g, char => char.toUpperCase()).replace(/\s+/g, '');
+    };
     const petImage = detailedMode ? DetailedPet[formatPetName(petName) as keyof typeof DetailedPet] : InvyPet[formatPetName(petName) as keyof typeof InvyPet];
-
-
-    console.log(formatPetName(petName));
-
     return (
-      <Box className={petIconClass}>
+      <Box className={petIconClass} onClick={() => manualMode && handlePetClick(petName)}>
         <img src={petImage} alt={petName} className={detailedMode ? 'detailed-pet-image' : undefined} />
       </Box>
     );
+  };
+
+  const renderPetGrid = (category: string, petNames: string[], pets: PetData) => {
+    const visiblePets = petNames.map(petName => renderPetBox(petName, pets)).filter(petBox => petBox !== null);
+    if (missingMode && visiblePets.length === 0) {
+      return null;
+    }
+    return (
+      <Grid sx={{pl: 2, pr: 3, pb: 1.5, pt: 1.5}}>
+        <Box sx={{display: 'flex'}}> 
+          <Typography className="pet-category-title">{category}</Typography>
+          <div className="space-divider" />
+        </Box>
+        <Box className="pet-grid">
+          {visiblePets}
+        </Box>
+      </Grid>
+    );
+  };
+
+  const renderMissingPets = (pets: PetData) => {
+    const missingPets = Object.keys(pets).filter(petName => getPetIconClass(petName, pets) === 'pet-icon');
+    if (missingPets.length === 0) {
+      return null;
+    }
+    return renderPetGrid("Missing Pets", missingPets, pets);
+  };
+
+  const renderObtainedPets = (category: string, petNames: string[], pets: PetData) => {
+    const obtainedPets = petNames.filter(petName => getPetIconClass(petName, pets) === 'obtained-pet-icon');
+    if (obtainedPets.length === 0) {
+      return null;
+    }
+    return renderPetGrid(category, obtainedPets, pets);
   };
 
   return (
@@ -88,7 +132,7 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
           </Grid>
           )}
 
-          {isGroup && Object.keys(petCounts).length > 1 && (
+          {isGroup && (
           <Grid size={{xs: 4}} sx={{display: 'flex', justifyContent: 'center'}}>
             <Box sx={{display: 'flex'}}>
               <div style={{ height: "160px", width: "120px" }}>
@@ -135,169 +179,39 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
           </Grid>
 
           <Grid container className="pet-container">
-          <Grid sx={{pl: 2}}>
-            <Box sx={{display: 'flex'}}> 
-              <Typography className="pet-category-title">Group</Typography>
-              <div className="space-divider" />
-            </Box>
-            <Box className="pet-grid">
-              {renderPetBox("Baby mole", petCount.pets)}
-              {renderPetBox("Prince black dragon", petCount.pets)}
-              {renderPetBox("Kalphite princess", petCount.pets)}
-              {renderPetBox("Pet dark core", petCount.pets)}
-              {renderPetBox("Sraracha", petCount.pets)}
-              {renderPetBox("Little nightmare", petCount.pets)}
-              {renderPetBox("Scurry", petCount.pets)}
-              {renderPetBox("Huberte", petCount.pets)}
-            </Box>
+            {missingMode && combinedMissing ? (
+              renderMissingPets(petCount.pets)
+            ) : combinedMissing ? (
+              <>
+                {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], petCount.pets)}
+                {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], petCount.pets)}
+                {renderObtainedPets("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], petCount.pets)}
+                {renderObtainedPets("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], petCount.pets)}
+                {renderObtainedPets("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], petCount.pets)}
+                {renderObtainedPets("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], petCount.pets)}
+                {renderObtainedPets("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], petCount.pets)}
+                {renderObtainedPets("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], petCount.pets)}
+                {renderObtainedPets("Raids", ["Olmlet", "Lil' zik", "Tumeken's guardian"], petCount.pets)}
+                {renderObtainedPets("Skilling Minigames", ["Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector"], petCount.pets)}
+                {renderObtainedPets("Miscellaneous", ["Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin"], petCount.pets)}
+                {renderMissingPets(petCount.pets)}
+              </>
+            ) : (
+              <>
+                {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], petCount.pets)}
+                {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], petCount.pets)}
+                {renderPetGrid("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], petCount.pets)}
+                {renderPetGrid("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], petCount.pets)}
+                {renderPetGrid("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], petCount.pets)}
+                {renderPetGrid("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], petCount.pets)}
+                {renderPetGrid("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], petCount.pets)}
+                {renderPetGrid("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], petCount.pets)}
+                {renderPetGrid("Raids", ["Olmlet", "Lil' zik", "Tumeken's guardian"], petCount.pets)}
+                {renderPetGrid("Skilling Minigames", ["Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector"], petCount.pets)}
+                {renderPetGrid("Miscellaneous", ["Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin"], petCount.pets)}
+              </>
+            )}
           </Grid>
-
-          <Grid sx={{pl: 2, pr: 3}}>
-            <Box sx={{display: 'flex'}}> 
-              <Typography className="pet-category-title">Skilling</Typography>
-              <div className="space-divider" />
-            </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Rift guardian", petCount.pets)}
-                {renderPetBox("Beaver", petCount.pets)}
-                {renderPetBox("Rock golem", petCount.pets)}
-                {renderPetBox("Baby chinchompa", petCount.pets)}
-                {renderPetBox("Rocky", petCount.pets)}
-                {renderPetBox("Tangleroot", petCount.pets)}
-                {renderPetBox("Heron", petCount.pets)}
-                {renderPetBox("Giant squirrel", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid sx={{pl: 2, mt: 3}}>
-            <Box sx={{display: 'flex'}}> 
-              <Typography className="pet-category-title">GWD</Typography>
-              <div className="space-divider" />
-            </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Pet kree'arra", petCount.pets)}
-                {renderPetBox("Pet general graardor", petCount.pets)}
-                {renderPetBox("Pet k'ril tsutsaroth", petCount.pets)}
-                {renderPetBox("Pet zilyana", petCount.pets)}
-                {renderPetBox("Nexling", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid sx={{mt: 3, pl: 2}}>
-            <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">DKS</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Pet dagannoth rex", petCount.pets)}
-                {renderPetBox("Pet dagannoth prime", petCount.pets)}
-                {renderPetBox("Pet dagannoth supreme", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid sx={{mt: 3, pl: 2}}>
-            <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">Slayer</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Pet smoke devil", petCount.pets)}
-                {renderPetBox("Pet kraken", petCount.pets)}
-                {renderPetBox("Hellpuppy", petCount.pets)}
-                {renderPetBox("Abyssal orphan", petCount.pets)}
-                {renderPetBox("Noon", petCount.pets)}
-                {renderPetBox("Ikkle hydra", petCount.pets)}
-                {renderPetBox("Nid", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid sx={{mt: 3}}>
-            <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">Quest</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Vorki", petCount.pets)}
-                {renderPetBox("Muphin", petCount.pets)}
-                {renderPetBox("Wisp", petCount.pets)}
-                {renderPetBox("Butch", petCount.pets)}
-                {renderPetBox("Baron", petCount.pets)}
-                {renderPetBox("Lil'viathan", petCount.pets)}
-                {renderPetBox("Moxi", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid sx={{mt: 3}}>
-            <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">PvM Minigame</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Tzrek-jad", petCount.pets)}
-                {renderPetBox("Jal-nib-rek", petCount.pets)}
-                {renderPetBox("Youngllef", petCount.pets)}
-                {renderPetBox("Lil' creator", petCount.pets)}
-                {renderPetBox("Smol Heredit", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid sx={{mt: 3}}>
-            <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">Wilderness</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Pet chaos elemental", petCount.pets)}
-                {renderPetBox("Venenatis spiderling", petCount.pets)}
-                {renderPetBox("Callisto cub", petCount.pets)}
-                {renderPetBox("Vet'ion jr. ", petCount.pets)}
-                {renderPetBox("Scorpia's offspring", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid container sx={{justifyContent: 'space-around', width: '100%'}}>
-            <Grid sx={{mt: 3}}>
-            <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">Raids</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Olmlet", petCount.pets)}
-                {renderPetBox("Lil' zik", petCount.pets)}
-                {renderPetBox("Tumeken's guardian", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid sx={{mt: 3}}>
-            <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">Skilling Minigames</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Pet penance queen", petCount.pets)}
-                {renderPetBox("Phoenix", petCount.pets)}
-                {renderPetBox("Smolcano", petCount.pets)}
-                {renderPetBox("Tiny tempor", petCount.pets)}
-                {renderPetBox("Abyssal protector", petCount.pets)}
-              </Box>
-            </Grid>
-
-            <Grid  sx={{mt: 3}}>
-              <Box sx={{display: 'flex'}}> 
-                <Typography className="pet-category-title">Miscellaneous</Typography>
-                <div className="space-divider" />
-              </Box>
-              <Box className="pet-grid">
-                {renderPetBox("Pet snakeling", petCount.pets)}
-                {renderPetBox("Chompy chick", petCount.pets)}
-                {renderPetBox("Skotos", petCount.pets)}
-                {renderPetBox("Herbi", petCount.pets)}
-                {renderPetBox("Bloodhound", petCount.pets)}
-                {renderPetBox("Quetzin", petCount.pets)}
-              </Box>
-            </Grid>     
-        </Grid>
-        </Grid>
         </div>
       ))
     )}
