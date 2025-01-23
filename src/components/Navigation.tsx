@@ -1,7 +1,7 @@
 import { Sidebar, Menu } from 'react-pro-sidebar';
 import { Link, useLocation } from 'react-router-dom';
 import nav3400rs from "../resources/nav/nav3400rs.png";
-import { Home, Pets } from '@mui/icons-material';
+import { Home, Pets, SmartToyOutlined } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import React from 'react';
 import './Navigation.css';
@@ -42,6 +42,11 @@ export function Navigation() {
               <Link to="/pet-gen" >
                 <Box className={`menu-box ${location.pathname === '/pet-gen' ? 'active' : ''}`}>
                   <Pets className="menu-item"/>
+                </Box>
+              </Link>
+              <Link to="/drop-bot" >
+                <Box className={`menu-box ${location.pathname === '/drop-bot' ? 'active' : ''}`}>
+                  <SmartToyOutlined className="menu-item"/>
                 </Box>
               </Link>
             </Menu>

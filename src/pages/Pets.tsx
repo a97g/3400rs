@@ -1,14 +1,15 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useState } from 'react';
-import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox } from '@mui/material';
+import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Page from '../components/Page';
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, TerrainOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import './Pets.css';
 import PetTable from '../components/PetTable';
 import PetLeaderboard from '../components/PetLeaderboard';
+import AsciiGenerator from '../components/AsciiGenerator';
 
 export default function Pets() {
   const [group, setGroup] = useState('2394');
@@ -19,6 +20,11 @@ export default function Pets() {
   const [isDetailed, setIsDetailed] = useState(false);
   const [combinedMissing, setCombinedMissing] = useState(false);
   const [manualMode, setManualMode] = useState(false);
+  const [petBgColor1, setPetBgColor1] = useState('#492023');
+  const [petBgColor2, setPetBgColor2] = useState('#463827');
+  const [asciiGen, setAsciiGen] = useState(false);
+  const [discordFormatting, setDiscordFormatting] = useState(false);
+
   
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const [petCounts, setPetCounts] = useState<{ [key: string]: PetCountResponse }>({ '': emptyPets });
@@ -64,57 +70,117 @@ export default function Pets() {
     }
   };
 
+  const handleBgColorChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = event.target.value;
+    setPetBgColor1(newColor);
+    document.documentElement.style.setProperty('--obtained-pet-bg', `linear-gradient(135deg, ${newColor}, ${petBgColor2})`);
+  };
+
+  const handleBgColorChange2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = event.target.value;
+    setPetBgColor2(newColor);
+    document.documentElement.style.setProperty('--obtained-pet-bg', `linear-gradient(135deg, ${petBgColor1}, ${newColor})`);
+  };
+
+  const handleToggleChange = (event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
+    if (newAlignment === 'individual') {
+      setIsGroup(false);
+      setAsciiGen(false);
+      setPetCounts({ '': emptyPets });
+      setIsLeaderboard(false);
+    } else if (newAlignment === 'group') {
+      setIsGroup(true);
+      setAsciiGen(false);
+      setPetCounts({ '': emptyPets });
+      setMissingMode(false);
+      setManualMode(false);
+    } else if (newAlignment === 'ascii') {
+      setAsciiGen(true);
+      setIsGroup(false);
+      setIsLeaderboard(false);
+      setMissingMode(false);
+      setManualMode(false);
+    }
+  };
+
   return (
     <Page title="Pet List Generator | 34rs">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         <Box sx={{ backgroundColor: '#1b1a1d', width: '304px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1 }}>
-            <Typography variant="h4" sx={{ textAlign: 'center', mt: 3 }}>List Settings</Typography>
+            <Typography variant="h4" sx={{ textAlign: 'center', mt: 3, fontWeight: 600 }}>List Settings</Typography>
             <div className="nav-space-divider" />
-            <Button variant="contained" onClick={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false);}} className='setting-button' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <PersonOutlined />
-              Individual RSN
-              <Checkbox checked={!isGroup} onChange={() => { setIsGroup(false); setPetCounts({ '': emptyPets }); setIsLeaderboard(false); }} color="default" className="settings-toggle"/>
-            </Button>
-            <Button variant="contained" onClick={() => { setManualMode(!manualMode); }} className='setting-button settings-toggle' disabled={isGroup ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-              <PanToolAltOutlined />
-              Manual Mode
-              <Checkbox checked={manualMode} onChange={() => { setManualMode(!manualMode); }} color="default"/>
-            </Button>
-            <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <SentimentDissatisfiedOutlined />
-              Only Missing
-              <Checkbox checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default"className="settings-toggle" />
-            </Button>
-            <Button variant="contained" onClick={() => { setCombinedMissing(!combinedMissing);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <JoinFull />
-              Combine Missing
-              <Checkbox checked={combinedMissing} onChange={() => setCombinedMissing(!combinedMissing)} color="default" className="settings-toggle"/>
-            </Button>
-            <div className="nav-space-divider" />
-            <Button variant="contained" onClick={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <GroupsOutlined />
-              Group / Clan
-              <Checkbox checked={isGroup} onChange={() => { setIsGroup(true); setPetCounts({ '': emptyPets }); setMissingMode(false); setManualMode(false);}} color="default" className="settings-toggle"/>
-            </Button>
-            <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); }} className='setting-button settings-toggle' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-              <LeaderboardOutlined />
-              Leaderboard Mode
-              <Checkbox checked={isLeaderboard} onChange={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); setCombinedMissing(false); }} color="default" className="settings-toggle"/>
-            </Button>
-            <div className="nav-space-divider" />
-            <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-              <DetailsOutlined />
-              Detailed Sprites
-              <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
-            </Button>
-
-            <Button variant="contained" className='setting-button' sx={{mb: 3}}>Include Dusts?</Button>
-
-
-            <Button variant="contained" className='setting-button' sx={{mb: 3}}>Pet Background Color</Button>
-            <Button variant="contained" className='setting-button'>Ascii Table Generator</Button>
-
+            <ToggleButtonGroup
+              value={isGroup ? 'group' : asciiGen ? 'ascii' : 'individual'}
+              exclusive
+              onChange={handleToggleChange}
+              sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', backgroundColor: '#141316' }}
+            >
+              <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                <PersonOutlined />
+                {/* Individual RSN */}
+              </ToggleButton>
+              <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                <GroupsOutlined />
+                {/* Group / Clan */}
+              </ToggleButton>
+              <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                <TableChartOutlined />
+                {/* Ascii Table Generator */}
+              </ToggleButton>
+            </ToggleButtonGroup>
+            {!asciiGen && (
+              <>
+                <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <SentimentDissatisfiedOutlined />
+                  Only Missing
+                  <Checkbox checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default"className="settings-toggle" />
+                </Button>
+                <Button variant="contained" onClick={() => { setCombinedMissing(!combinedMissing);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <JoinFull />
+                  Combine Missing
+                  <Checkbox checked={combinedMissing} onChange={() => setCombinedMissing(!combinedMissing)} color="default" className="settings-toggle"/>
+                </Button>
+                <div className="nav-space-divider" />
+                {!isGroup && (
+                  <Button variant="contained" onClick={() => { setManualMode(!manualMode); }} className='setting-button settings-toggle' disabled={isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                    <PanToolAltOutlined />
+                    Manual Mode
+                    <Checkbox checked={manualMode} onChange={() => { setManualMode(!manualMode); }} color="default"/>
+                  </Button>
+                )}
+                {isGroup && (
+                <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); } } className='setting-button settings-toggle' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <LeaderboardOutlined />
+                    Leaderboard Mode
+                  <Checkbox checked={isLeaderboard} onChange={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); setCombinedMissing(false); } } color="default" className="settings-toggle" />
+                </Button>
+                )}
+                <div className="nav-space-divider" />
+                <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                  <DetailsOutlined />
+                  Detailed Sprites
+                  <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
+                </Button>
+                {!isLeaderboard && (
+                  <Button variant="contained" className='setting-button' sx={{mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                  <ColorLensOutlined />
+                  Pet Bg
+                  <Box>
+                    <input type="color" value={petBgColor1} onChange={handleBgColorChange1} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
+                    <input type="color" value={petBgColor2} onChange={handleBgColorChange2} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
+                  </Box>
+                </Button>
+                )}
+              </>
+            )}
+            {asciiGen && (
+              <Button variant="contained" onClick={() => { setDiscordFormatting(!discordFormatting); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                <ContentPasteGoOutlined />
+                Discord Formatting
+                <Checkbox checked={discordFormatting} onChange={() => { setDiscordFormatting(!discordFormatting); }} color="default"/>
+              </Button>
+            )}
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1 }}>
             <Box>
@@ -128,14 +194,37 @@ export default function Pets() {
             <Box sx={{ display: 'flex', maxwidth: '700px', alignItems: 'flex-end', pl: 3 }}>
               <img src={goldavi} width="125px" height="125px" alt="gold trophy" />
               <Box>
-                <Typography sx={{ ml: 2, fontWeight: '500' }} variant='h4'>{isGroup ? isLeaderboard ? 'Leaderboard' : 'Group' : 'Individual' }  Pet List Generator</Typography>
-                <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
-                  Please enter your RuneScape username and click the magnifying glass.
+                <Typography sx={{ ml: 2, fontWeight: '500' }} variant='h4'>{asciiGen ? 'Ascii' : isGroup ? isLeaderboard ?  'Leaderboard' : 'Group' : 'Individual' }  Pet List Generator</Typography>
+                {!isGroup && !asciiGen && (
+                  <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
+                  Enter your RuneScape username and click the magnifying glass.
                   <br />
                   This will query the Temple's API to retrieve and display your pets in the chart below.
                   <br />
                   Use the sidebar options to customize the chart's visual appearance.
-                </Typography>
+                  </Typography>
+                )}
+                {isGroup && !asciiGen && (
+                  <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
+                  Enter your Group / Clans Temple Id and click the magnifying glass.
+                  <br />
+                  This will query the Temple's API to retrieve and display your groups pets in the chart below.
+                  <br />
+                  Use the sidebar options to customize the chart's visual appearance or toggle between leaderboard and comparative mode.
+                  </Typography>
+                )}
+                {asciiGen && (
+                  <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
+                  Enter in your pet names, kill counts, and dates to generate an ASCII table.
+                  <br />
+                  Use the sidebar options to customize the formatting for displaying in different locations.
+                  <br />
+                  After clicking Generate Ascii Table the table will be copied to your clipboard.
+                  <br />
+                  Some adjustments will need to be made, i did my best :D
+                  </Typography>
+                )}
+
               </Box>
             </Box>
 
@@ -170,9 +259,23 @@ export default function Pets() {
             </Box>
           </Box>
           <div className="nav-space-divider" />
-          <Box sx={{minWidth: '1400px'}}></Box>
-          {!isLeaderboard && (<PetTable petCounts={petCounts} isGroup={isGroup} missingMode={missingMode} detailedMode={isDetailed} combinedMissing={combinedMissing} manualMode={manualMode}/>)}
-          {isLeaderboard && (<PetLeaderboard petCounts={petCounts}/>)}
+          {/* <Box sx={{minWidth: '1400px'}}></Box> */}
+          {!isLeaderboard && !asciiGen && (
+            <PetTable 
+              petCounts={petCounts} 
+              isGroup={isGroup} 
+              missingMode={missingMode} 
+              detailedMode={isDetailed} 
+              combinedMissing={combinedMissing} 
+              manualMode={manualMode}/>
+          )}
+          {isLeaderboard && !asciiGen && (
+            <PetLeaderboard 
+            petCounts={petCounts}/>
+          )}
+          {asciiGen && (
+            <AsciiGenerator discordFormat={discordFormatting}/>
+          )}
         </Container>
       </Box>
     </Page>

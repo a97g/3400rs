@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import * as InvyPet from '../resources/pets/inv';
@@ -29,11 +29,31 @@ interface PetTableProps {
 export default function PetTable({ petCounts, isGroup, missingMode, detailedMode, combinedMissing, manualMode }: PetTableProps) {
   const totalPets = 62;
   const totalHours = 5270;
-  const [manualPets, setManualPets] = useState<PetData>({});
+  const [manualPets, setManualPets] = useState<PetCountResponse>({
+    pet_count: 0,
+    pet_hours: 0,
+    pets: {},
+    player: '',
+    rank: 0
+  });
+  const [confirmed, setConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (manualMode) {
+      const allPets: PetData = {};
+      Object.keys(InvyPet).forEach(petName => {
+        allPets[petName] = 0;
+      });
+      setManualPets(prevState => ({
+        ...prevState,
+        pets: allPets
+      }));
+    }
+  }, [manualMode]);
 
   const getPetIconClass = (petName: string, pets: PetData) => {
     if (manualMode) {
-      return manualPets[petName] ? 'obtained-pet-icon' : 'pet-icon';
+      return manualPets.pets[petName] ? 'obtained-pet-icon' : 'pet-icon';
     }
     return Object.entries(pets).find(([name, count]) => name === petName && count === 1)
       ? 'obtained-pet-icon'
@@ -43,8 +63,16 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
   const handlePetClick = (petName: string) => {
     setManualPets(prevState => ({
       ...prevState,
-      [petName]: prevState[petName] ? 0 : 1
+      pets: {
+        ...prevState.pets,
+        [petName]: prevState.pets[petName] ? 0 : 1
+      },
+      pet_count: Object.values(prevState.pets).filter(count => count === 1).length + (prevState.pets[petName] ? -1 : 1)
     }));
+  };
+
+  const handleConfirm = () => {
+    setConfirmed(true);
   };
 
   const renderPetBox = (petName: string, pets: PetData) => {
@@ -109,9 +137,9 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
           <Box sx={{display: 'flex'}}>
             <div style={{ height: "160px", width: "120px" }}>
               <CircularProgressbar 
-              value={petCount.pet_count / totalPets} 
+              value={manualMode ? manualPets.pet_count / totalPets : petCount.pet_count / totalPets} 
               maxValue={1} 
-              text={`${petCount.pet_count} / ${totalPets}`} 
+              text={`${manualMode ? manualPets.pet_count : petCount.pet_count} / ${totalPets}`} 
               styles={buildStyles({
               strokeLinecap: 'round',
               pathTransitionDuration: 3,
@@ -179,9 +207,40 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
           </Grid>
 
           <Grid container className="pet-container">
-            {missingMode && combinedMissing ? (
+            {manualMode && missingMode && combinedMissing ? (
+              renderMissingPets(manualPets.pets)
+            ) : manualMode && combinedMissing ? (
+              <>
+                {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], manualPets.pets)}
+                {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], manualPets.pets)}
+                {renderObtainedPets("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], manualPets.pets)}
+                {renderObtainedPets("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], manualPets.pets)}
+                {renderObtainedPets("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], manualPets.pets)}
+                {renderObtainedPets("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], manualPets.pets)}
+                {renderObtainedPets("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], manualPets.pets)}
+                {renderObtainedPets("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], manualPets.pets)}
+                {renderObtainedPets("Raids", ["Olmlet", "Lil' zik", "Tumeken's guardian"], manualPets.pets)}
+                {renderObtainedPets("Skilling Minigames", ["Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector"], manualPets.pets)}
+                {renderObtainedPets("Miscellaneous", ["Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin"], manualPets.pets)}
+                {renderMissingPets(manualPets.pets)}
+              </>
+            ) : manualMode ? (
+              <>
+                {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], manualPets.pets)}
+                {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], manualPets.pets)}
+                {renderPetGrid("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], manualPets.pets)}
+                {renderPetGrid("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], manualPets.pets)}
+                {renderPetGrid("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], manualPets.pets)}
+                {renderPetGrid("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], manualPets.pets)}
+                {renderPetGrid("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], manualPets.pets)}
+                {renderPetGrid("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], manualPets.pets)}
+                {renderPetGrid("Raids", ["Olmlet", "Lil' zik", "Tumeken's guardian"], manualPets.pets)}
+                {renderPetGrid("Skilling Minigames", ["Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector"], manualPets.pets)}
+                {renderPetGrid("Miscellaneous", ["Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin"], manualPets.pets)}
+              </>
+            ): missingMode && combinedMissing && !manualMode ? (
               renderMissingPets(petCount.pets)
-            ) : combinedMissing ? (
+            ) : combinedMissing && !manualMode ? (
               <>
                 {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], petCount.pets)}
                 {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], petCount.pets)}
@@ -212,6 +271,11 @@ export default function PetTable({ petCounts, isGroup, missingMode, detailedMode
               </>
             )}
           </Grid>
+          {manualMode && !confirmed && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Button variant="contained" onClick={handleConfirm} className="setting-button">Manually Generate List</Button>
+            </Box>
+          )}
         </div>
       ))
     )}

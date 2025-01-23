@@ -1,4 +1,8 @@
 /* Ensure that the pet grid layout is horizontal */
+:root {
+  --obtained-pet-bg: linear-gradient(135deg, #492023, #463827);
+}
+
 .pet-grid {
     display: flex;
     flex-wrap: wrap; /* Ensure the items wrap properly on smaller screens */
@@ -67,7 +71,7 @@
 .obtained-pet-icon {
     width: 40px; /* Set width of the box to 40px */
     height: 40px; /* Set height of the box to 40px */
-    background: linear-gradient(135deg, #492023, #463827);
+    background: var(--obtained-pet-bg);
     border-radius: 8px; /* Rounded corners */
     overflow: hidden; /* Ensures the image stays within the rounded box */
     display: flex;
