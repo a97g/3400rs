@@ -41,6 +41,10 @@
 .detailed-pet-image {
     max-height: 38px;
     max-width: 33px;
+    -webkit-filter: drop-shadow(0.0px 0.0px 0 black)
+                    drop-shadow(-0.0px 0.0px 0 black)
+                    drop-shadow(0.0px -0.0px 0 black)
+                    drop-shadow(-0.0px -0.0px 0 black);
 }
 
 /* Style the pet grid typography */
@@ -128,7 +132,7 @@
   }
   
   .MuiCheckbox-root.Mui-checked {
-    color: green; /* Checked color */
+    color: orange; /* Checked color */
   }
   
   .MuiCheckbox-root.MuiCheckbox-indeterminate {

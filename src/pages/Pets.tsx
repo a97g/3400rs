@@ -1,15 +1,16 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useState } from 'react';
-import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField } from '@mui/material';
+import { useCallback, useRef, useState } from 'react';
+import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField, Alert } from '@mui/material';
 import Page from '../components/Page';
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import './Pets.css';
 import PetTable from '../components/PetTable';
 import PetLeaderboard from '../components/PetLeaderboard';
 import AsciiGenerator from '../components/AsciiGenerator';
+import { toPng } from 'html-to-image';
 
 export default function Pets() {
   const totalPets = 62;
@@ -17,12 +18,14 @@ export default function Pets() {
 
   const [group, setGroup] = useState('2394');
   const [player, setPlayer] = useState('3400');
+  const [rsnError, setRsnError] = useState(false);
   const [missingMode, setMissingMode] = useState(false);
   const [isGroup, setIsGroup] = useState(false);
   const [isLeaderboard, setIsLeaderboard] = useState(false);
   const [isDetailed, setIsDetailed] = useState(false);
   const [combinedMissing, setCombinedMissing] = useState(false);
   const [manualMode, setManualMode] = useState(false);
+  const [kcMode, setKcMode] = useState(false);
   const [petBgColor1, setPetBgColor1] = useState('#492023');
   const [petBgColor2, setPetBgColor2] = useState('#463827');
   const [asciiGen, setAsciiGen] = useState(false);
@@ -54,8 +57,15 @@ export default function Pets() {
 
     try {
       const response = await axios.get<{ data: { [key: string]: PetCountResponse } }>(url, { params });
-      setPetCounts(response.data.data);
-      console.log(response.data.data);
+      if (response && response.data && response.data.data) {
+        setPetCounts(response.data.data);
+        console.log(response.data.data);
+      } else {
+        setRsnError(true);
+        setTimeout(() => {
+          setRsnError(false);
+        }, 5000);
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error('Axios error:', error.message);
@@ -136,6 +146,31 @@ export default function Pets() {
     setImportDialogOpen(false);
   };
 
+  const ref = useRef<HTMLDivElement>(null);
+  
+  const onDownloadTable = useCallback(() => {
+    if (ref.current === null) {
+      return
+    }
+
+    toPng(ref.current, { cacheBust: true, })
+      .then((dataUrl) => {
+        const link = document.createElement('a')
+        link.download = `${player}-pet-table.png`
+        link.href = dataUrl
+        link.click()
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }, [ref])
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      getPetCount();
+    }
+  };
+
   return (
     <Page title="Pet List Generator | 34rs">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -176,11 +211,18 @@ export default function Pets() {
                 </Button>
                 <div className="nav-space-divider" />
                 {!isGroup && (
-                  <Button variant="contained" onClick={() => { setManualMode(!manualMode); }} className='setting-button settings-toggle' disabled={isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-                    <PanToolAltOutlined />
-                    Manual Mode
-                    <Checkbox checked={manualMode} onChange={() => { setManualMode(!manualMode); }} color="default"/>
-                  </Button>
+                  <>
+                    <Button variant="contained" onClick={() => { setManualMode(!manualMode); }} className='setting-button settings-toggle' disabled={isGroup ? true : false} sx={{ display: 'flex', mb: 3, alignItems: 'center', justifyContent: 'space-between' }} >
+                      <PanToolAltOutlined />
+                      Manual Mode
+                      <Checkbox checked={manualMode} onChange={() => { setManualMode(!manualMode); }} color="default"/>
+                    </Button>
+                    <Button variant="contained" onClick={() => { setKcMode(!kcMode); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                      <NumbersOutlined />
+                      Kc Mode
+                      <Checkbox checked={kcMode} onChange={() => { setKcMode(!kcMode); }} color="default"/>
+                    </Button>
+                  </>
                 )}
                 {isGroup && (
                 <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); } } className='setting-button settings-toggle' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -196,7 +238,7 @@ export default function Pets() {
                   <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
                 </Button>
                 {!isLeaderboard && (
-                  <Button variant="contained" className='setting-button' sx={{mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                  <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                   <ColorLensOutlined />
                   Pet Bg
                   <Box>
@@ -204,6 +246,12 @@ export default function Pets() {
                     <input type="color" value={petBgColor2} onChange={handleBgColorChange2} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
                   </Box>
                 </Button>
+                )}
+                {!isGroup && (
+                  <Button variant="contained" className='setting-button' sx={{ mt: 5, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', height: '75px' }} onClick={onDownloadTable}>
+                    <ContentCopyOutlined />
+                    Download Table
+                  </Button>
                 )}
               </>
             )}
@@ -267,10 +315,12 @@ export default function Pets() {
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', maxWidth: '300px', mr: 1 }}>
+              {rsnError && (<Alert severity="error">No pet data found.</Alert>)}
               <Typography>{isGroup ? 'Temple Group Id' : 'Runescape Name'}</Typography>
               <Paper
                 component="form"
                 sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 250, backgroundColor: '#242328', color: 'white' }}
+                onSubmit={(e) => { e.preventDefault(); getPetCount(); }}
               >
                 {isGroup && (
                   <>
@@ -289,6 +339,7 @@ export default function Pets() {
                   inputProps={{ 'aria-label': 'RuneScape Username' }}
                   value={isGroup ? group : player}
                   onChange={(event) => isGroup ? setGroup(event.target.value) : handleManualModeChange(event)}
+                  onKeyPress={handleKeyPress}
                 />
                 <IconButton type="button" sx={{ p: '10px', color: 'orange' }} aria-label="search" onClick={getPetCount}>
                   <Search />
@@ -307,7 +358,10 @@ export default function Pets() {
               missingMode={missingMode} 
               detailedMode={isDetailed} 
               combinedMissing={combinedMissing} 
-              manualMode={manualMode}/>
+              manualMode={manualMode}
+              kcMode={kcMode}
+              ref={ref}
+            />
           )}
           {isLeaderboard && !asciiGen && (
             <PetLeaderboard 

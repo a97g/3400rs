@@ -28,7 +28,7 @@ interface PetLeaderboardProps {
 
 const trophyImages = [goldTrophy, silverTrophy, bronzeTrophy];
 
-export default function PetLeaderboard({ totalPets, totalHours, petCounts, }: PetLeaderboardProps) {
+export default function PetLeaderboard({ totalPets, totalHours, petCounts }: PetLeaderboardProps) {
   const topThree = Object.values(petCounts).sort((a, b) => a.rank - b.rank).slice(0, 3);
   const remaining = Object.values(petCounts).sort((a, b) => a.rank - b.rank).slice(3);
 
