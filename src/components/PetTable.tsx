@@ -188,7 +188,9 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     "Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring",
     "Olmlet", "Lil' zik", "Tumeken's guardian",
     "Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector",
-    "Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin"
+    "Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin",
+    "Metamorphic Dust", "Sanguine Dust",
+    "Akkha", "Baba", "Kephri", "Zebak", "Warden"
   ];
 
   return (
@@ -294,6 +296,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                   {renderPetGrid("Raids", ["Olmlet", "Lil' zik", "Tumeken's guardian"], manualPets.pets)}
                   {renderPetGrid("Skilling Minigames", ["Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector"], manualPets.pets)}
                   {renderPetGrid("Miscellaneous", ["Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin"], manualPets.pets)}
+                  {showDusts && renderPetGrid("Dusts", ["Metamorphic Dust", "Sanguine Dust"], petCount.pets)}
+                  {showToa && renderPetGrid("Toa Transmogs", ["Akkha", "Baba", "Kephri", "Zebak", "Warden"], petCount.pets)}
                 </>
               ): missingMode && combinedMissing && !manualMode ? (
                 renderMissingPets(petCount.pets)

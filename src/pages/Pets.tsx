@@ -51,7 +51,7 @@ export default function Pets() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [logCount, setLogCount] = useState<{ [key: string]: any }>({ '': emptyLog });
 
-  const [transmogs, setTransmogs] = useState({
+  const [transmogs, setTransmogs] = useState<{ [key: string]: number }>({
     'Metamorphic Dust': 0,
     'Sanguine Dust': 0,
     Akkha: 0,
@@ -71,8 +71,7 @@ export default function Pets() {
     pets: PetData;
     player: string | number;
     rank: number;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [key: string]: any;
+    [key: string]: unknown;
   }
 
   interface LogCountResponse {
@@ -82,9 +81,7 @@ export default function Pets() {
     last_checked_string: string;
     last_changed: string;
     last_changed_string: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    items: any;
-    // items: { [key: string]: { count: number, item_date: number | null, hours?: number, missing_hours?: number } };
+    items: { [key: string]: { count: number }; };
     killcounts: { [key: string]: number };
     total_ehc: number;
   }
@@ -99,8 +96,7 @@ export default function Pets() {
 
     try {
       if (!isGroup) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const responseLog = await axios.get<{ data: { [key: string]: any } }>(urlLog, { params });
+        const responseLog = await axios.get<{ data: { [key: string]: LogCountResponse } }>(urlLog, { params });
         if (responseLog && responseLog.data && responseLog.data.data) {
           setLogCount(responseLog.data.data);
         } else {
@@ -132,13 +128,13 @@ export default function Pets() {
   useEffect(() => {
     if (logCount && logCount.items) {
       setTransmogs({
-        "Metamorphic Dust": logCount?.items["22386"].count,
+        "Metamorphic Dust": logCount?.items["22386"].count, 
         "Sanguine Dust": logCount?.items["25746"].count,
-        Akkha: logCount?.items["12197"].count,
-        Baba: logCount?.items["12197"].count,
-        Kephri: logCount?.items["12197"].count,
-        Zebak: logCount?.items["12197"].count,
-        Warden: logCount?.items["12197"].count
+        Akkha: logCount?.items["27377"].count,
+        Baba: logCount?.items["27378"].count,
+        Kephri: logCount?.items["27379"].count,
+        Zebak: logCount?.items["27380"].count,
+        Warden: logCount?.items["27381"].count
       });
     }
   }, [logCount]);
@@ -374,18 +370,18 @@ export default function Pets() {
                   <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
                   Enter your RuneScape username and click the magnifying glass.
                   <br />
-                  This will query the Temple's API to retrieve and display your pets in the chart below.
+                  This will query the Temple&apos;s API to retrieve and display your pets in the chart below.
                   <br />
-                  Use the sidebar options to customize the chart's visual appearance.
+                  Use the sidebar options to customize the chart&apos;s visual appearance.
                   </Typography>
                 )}
                 {isGroup && !asciiGen && (
                   <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
                   Enter your Group / Clans Temple Id and click the magnifying glass.
                   <br />
-                  This will query the Temple's API to retrieve and display your groups pets in the chart below.
+                  This will query the Temple&apos;s API to retrieve and display your groups pets in the chart below.
                   <br />
-                  Use the sidebar options to customize the chart's visual appearance or toggle between leaderboard and comparative mode.
+                  Use the sidebar options to customize the chart&apos;s visual appearance or toggle between leaderboard and comparative mode.
                   </Typography>
                 )}
                 {asciiGen && (
