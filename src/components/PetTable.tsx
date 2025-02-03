@@ -7,7 +7,6 @@ import * as DetailedPet from '../resources/pets/detailed';
 import goldTrophy from '../resources/pets/assets/goldped.png';
 import silverTrophy from '../resources/pets/assets/silverped.png';
 import bronzeTrophy from '../resources/pets/assets/bronzeped.png';
-import osrs from '../resources/pets/assets/osrs-icon.png';
 
 interface PetData {
   [key: string]: number;
@@ -199,11 +198,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, isGroup, mi
             {!isGroup && (
               <>
               <Grid size={{xs: 4}} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
-                <img src={osrs} alt="osrs" style={{width: '100px', height: '100px', position: 'absolute', top: 0, right: '50%'}} />
-                <Box>
-                <img src={`https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} />
-                <Typography variant="h3" sx={{textAlign: 'center', mb: 5, fontWeight: '600', fontFamily: 'Montserrat !important'}}>{petCount.player}</Typography>
-                </Box>
+                <img src={`https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon'/>
+                <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>
               </Grid>
               </>
             )}

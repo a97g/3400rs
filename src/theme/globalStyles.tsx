@@ -90,7 +90,8 @@ export default function GlobalStyles() {
             fontWeight: 300, // Light
           },
           '.MuiTypography-h3': {
-            fontWeight: 300, // Light
+            fontFamily: 'Montserrat !important',
+            fontWeight: '600 !important', // Semi-bold
           },
           '.MuiTypography-h4': {
             fontWeight: 300, // Light

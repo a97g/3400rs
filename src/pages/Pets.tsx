@@ -199,17 +199,6 @@ export default function Pets() {
             </ToggleButtonGroup>
             {!asciiGen && (
               <>
-                <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <SentimentDissatisfiedOutlined />
-                  Only Missing
-                  <Checkbox checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default"className="settings-toggle" />
-                </Button>
-                <Button variant="contained" onClick={() => { setCombinedMissing(!combinedMissing);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <JoinFull />
-                  Combine Missing
-                  <Checkbox checked={combinedMissing} onChange={() => setCombinedMissing(!combinedMissing)} color="default" className="settings-toggle"/>
-                </Button>
-                <div className="nav-space-divider" />
                 {!isGroup && (
                   <>
                     <Button variant="contained" onClick={() => { setManualMode(!manualMode); }} className='setting-button settings-toggle' disabled={isGroup ? true : false} sx={{ display: 'flex', mb: 3, alignItems: 'center', justifyContent: 'space-between' }} >
@@ -221,6 +210,21 @@ export default function Pets() {
                       <NumbersOutlined />
                       Kc Mode
                       <Checkbox checked={kcMode} onChange={() => { setKcMode(!kcMode); }} color="default"/>
+                    </Button>
+                  </>
+                )}
+                {!manualMode && (
+                  <>
+                    <div className="nav-space-divider" />
+                    <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <SentimentDissatisfiedOutlined />
+                      Only Missing
+                      <Checkbox checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default"className="settings-toggle" />
+                    </Button>
+                    <Button variant="contained" onClick={() => { setCombinedMissing(!combinedMissing);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <JoinFull />
+                      Combine Missing
+                      <Checkbox checked={combinedMissing} onChange={() => setCombinedMissing(!combinedMissing)} color="default" className="settings-toggle"/>
                     </Button>
                   </>
                 )}
@@ -238,7 +242,7 @@ export default function Pets() {
                   <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
                 </Button>
                 {!isLeaderboard && (
-                  <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                  <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2}}>
                   <ColorLensOutlined />
                   Pet Bg
                   <Box>
