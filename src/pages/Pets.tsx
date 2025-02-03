@@ -1,9 +1,9 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField, Alert } from '@mui/material';
 import Page from '../components/Page';
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import './Pets.css';
@@ -23,6 +23,8 @@ export default function Pets() {
   const [isGroup, setIsGroup] = useState(false);
   const [isLeaderboard, setIsLeaderboard] = useState(false);
   const [isDetailed, setIsDetailed] = useState(false);
+  const [showDusts, setShowDusts] = useState(false);
+  const [showToa, setShowToa] = useState(false);
   const [combinedMissing, setCombinedMissing] = useState(false);
   const [manualMode, setManualMode] = useState(false);
   const [kcMode, setKcMode] = useState(false);
@@ -34,7 +36,30 @@ export default function Pets() {
   const [importedTable, setImportedTable] = useState('');
 
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
+  const emptyLog: LogCountResponse = {
+      "player": "",
+      "player_name_with_capitalization": "",
+      "last_checked": "",
+      "last_checked_string": "",
+      "last_changed": "",
+      "last_changed_string": "",
+      "items": {},
+      "killcounts": {},
+      "total_ehc": 0
+  }
   const [petCounts, setPetCounts] = useState<{ [key: string]: PetCountResponse }>({ '': emptyPets });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [logCount, setLogCount] = useState<{ [key: string]: any }>({ '': emptyLog });
+
+  const [transmogs, setTransmogs] = useState({
+    'Metamorphic Dust': 0,
+    'Sanguine Dust': 0,
+    Akkha: 0,
+    Baba: 0,
+    Kephri: 0,
+    Zebak: 0,
+    Warden: 0
+  });
 
   interface PetData {
     [key: string]: number;
@@ -46,20 +71,49 @@ export default function Pets() {
     pets: PetData;
     player: string | number;
     rank: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+  }
+
+  interface LogCountResponse {
+    player: string | number;
+    player_name_with_capitalization: string | number;
+    last_checked: string;
+    last_checked_string: string;
+    last_changed: string;
+    last_changed_string: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    items: any;
+    // items: { [key: string]: { count: number, item_date: number | null, hours?: number, missing_hours?: number } };
+    killcounts: { [key: string]: number };
+    total_ehc: number;
   }
 
   const getPetCount = async () => {
     const url = 'https://templeosrs.com/api/pets/pet_count.php';
+    const urlLog = 'https://templeosrs.com/api/collection-log/player_collections.php';
 
     const params = isGroup
       ? { group: group, count: 200 }
       : { player: player, count: 200 };
 
     try {
+      if (!isGroup) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const responseLog = await axios.get<{ data: { [key: string]: any } }>(urlLog, { params });
+        if (responseLog && responseLog.data && responseLog.data.data) {
+          setLogCount(responseLog.data.data);
+        } else {
+          setRsnError(true);
+          setTimeout(() => {
+            setRsnError(false);
+          }, 5000);
+        }
+      }
+      
       const response = await axios.get<{ data: { [key: string]: PetCountResponse } }>(url, { params });
       if (response && response.data && response.data.data) {
         setPetCounts(response.data.data);
-        console.log(response.data.data);
       } else {
         setRsnError(true);
         setTimeout(() => {
@@ -74,6 +128,20 @@ export default function Pets() {
       }
     }
   };
+
+  useEffect(() => {
+    if (logCount && logCount.items) {
+      setTransmogs({
+        "Metamorphic Dust": logCount?.items["22386"].count,
+        "Sanguine Dust": logCount?.items["25746"].count,
+        Akkha: logCount?.items["12197"].count,
+        Baba: logCount?.items["12197"].count,
+        Kephri: logCount?.items["12197"].count,
+        Zebak: logCount?.items["12197"].count,
+        Warden: logCount?.items["12197"].count
+      });
+    }
+  }, [logCount]);
 
   const handleManualModeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newPlayer = event.target.value;
@@ -229,11 +297,14 @@ export default function Pets() {
                   </>
                 )}
                 {isGroup && (
+                  <>
+                <div className="nav-space-divider" />
                 <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); } } className='setting-button settings-toggle' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <LeaderboardOutlined />
                     Leaderboard Mode
                   <Checkbox checked={isLeaderboard} onChange={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); setCombinedMissing(false); } } color="default" className="settings-toggle" />
                 </Button>
+                </>
                 )}
                 <div className="nav-space-divider" />
                 <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
@@ -241,6 +312,20 @@ export default function Pets() {
                   Detailed Sprites
                   <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
                 </Button>
+                {!isGroup && !isLeaderboard && (
+                  <>
+                <Button variant="contained" onClick={() => { setShowDusts(!showDusts); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                  <FilterHdrOutlined />
+                  Include Dusts
+                  <Checkbox checked={showDusts} onChange={() => { setShowDusts(!showDusts); }} color="default"/>
+                </Button>
+                <Button variant="contained" onClick={() => { setShowToa(!showToa); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                  <KeyOutlined />
+                  Include Toa Transmogs
+                  <Checkbox checked={showToa} onChange={() => { setShowToa(!showToa); }} color="default"/>
+                </Button>
+                </>
+                )}
                 {!isLeaderboard && (
                   <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2}}>
                   <ColorLensOutlined />
@@ -358,9 +443,12 @@ export default function Pets() {
               totalPets={totalPets}
               totalHours={totalHours}
               petCounts={petCounts} 
+              transmogs={transmogs}
               isGroup={isGroup} 
               missingMode={missingMode} 
               detailedMode={isDetailed} 
+              showDusts={showDusts}
+              showToa={showToa}
               combinedMissing={combinedMissing} 
               manualMode={manualMode}
               kcMode={kcMode}

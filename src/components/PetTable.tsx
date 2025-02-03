@@ -27,13 +27,16 @@ interface PetTableProps {
   isGroup: boolean;
   missingMode: boolean;
   detailedMode: boolean;
+  showDusts: boolean;
+  showToa: boolean;
+  transmogs: object;
   combinedMissing: boolean;
   manualMode: boolean;
   kcMode: boolean;
   ref: RefObject<HTMLDivElement>;
 }
 
-export default function PetTable({ totalPets, totalHours, petCounts, isGroup, missingMode, detailedMode, combinedMissing, manualMode, kcMode, ref}: PetTableProps) {
+export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref}: PetTableProps) {
   const [manualPets, setManualPets] = useState<PetCountResponse>({
     pet_count: 0,
     pet_hours: 0,
@@ -43,6 +46,28 @@ export default function PetTable({ totalPets, totalHours, petCounts, isGroup, mi
   });
   const [confirmed, setConfirmed] = useState(false);
   const [kcValues, setKcValues] = useState<{ [key: string]: string }>({});
+  const [passedPets, setPassedPets] = useState(petCounts);
+
+  useEffect(() => {
+    setPassedPets(petCounts);
+  }, [petCounts]);
+
+
+  useEffect(() => {
+      if (petCounts && petCounts['1'] && petCounts['1'].pets) {
+        const updatedPets = { ...petCounts['1'].pets };
+        Object.keys(transmogs).forEach(key => {
+          updatedPets[key] = transmogs[key as keyof typeof transmogs];
+        });
+        setPassedPets(prevState => ({
+          ...prevState,
+          '1': {
+            ...prevState['1'],
+            pets: updatedPets
+          }
+        }));
+      }
+  }, [transmogs, petCounts]);
 
   useEffect(() => {
     if (manualMode) {
@@ -168,8 +193,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, isGroup, mi
 
   return (
     <Box sx={{ p: '24px'}}>
-    {Object.keys(petCounts).length > 0 && (
-      Object.entries(petCounts).map(([key, petCount]) => (
+    {Object.keys(passedPets).length > 0 && (
+      Object.entries(passedPets).map(([key, petCount]) => (
         <div key={key}>
         <Box ref={ref}>
           {isGroup && <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>}
@@ -300,6 +325,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, isGroup, mi
                   {renderPetGrid("Raids", ["Olmlet", "Lil' zik", "Tumeken's guardian"], petCount.pets)}
                   {renderPetGrid("Skilling Minigames", ["Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector"], petCount.pets)}
                   {renderPetGrid("Miscellaneous", ["Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin"], petCount.pets)}
+                  {showDusts && renderPetGrid("Dusts", ["Metamorphic Dust", "Sanguine Dust"], petCount.pets)}
+                  {showToa && renderPetGrid("Toa Transmogs", ["Akkha", "Baba", "Kephri", "Zebak", "Warden"], petCount.pets)}
                 </>
               )}
             </Grid>
