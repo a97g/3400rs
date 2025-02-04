@@ -302,12 +302,14 @@ export default function Pets() {
                 </Button>
                 </>
                 )}
-                <div className="nav-space-divider" />
+                  <div className="nav-space-divider" />
+                {!isLeaderboard && (
                 <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
                   <DetailsOutlined />
                   Detailed Sprites
                   <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
                 </Button>
+                )}
                 {!isGroup && !isLeaderboard && (
                   <>
                 <Button variant="contained" onClick={() => { setShowDusts(!showDusts); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
