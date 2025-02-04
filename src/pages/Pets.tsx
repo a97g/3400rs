@@ -353,11 +353,11 @@ export default function Pets() {
               </>
             )}
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1 }}>
+          {/* <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1 }}>
             <Box>
               <Button variant="outlined">Settings</Button>
             </Box>
-          </Box>
+          </Box> */}
         </Box>
 
         <Container maxWidth="lg" sx={{padding: '0 !important'}}>

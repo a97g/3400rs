@@ -92,14 +92,23 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   };
 
   const handlePetClick = (petName: string) => {
-    setManualPets(prevState => ({
-      ...prevState,
-      pets: {
-        ...prevState.pets,
-        [petName]: prevState.pets[petName] ? 0 : 1
-      },
-      pet_count: Object.values(prevState.pets).filter(count => count === 1).length + (prevState.pets[petName] ? -1 : 1)
-    }));
+    const excludedPets = ["Metamorphic Dust", "Sanguine Dust", "Akkha", "Baba", "Kephri", "Zebak", "Warden"];
+    setManualPets(prevState => {
+      const isExcluded = excludedPets.includes(petName);
+      const newPetCount = isExcluded ? prevState.pet_count : Object.values(prevState.pets).filter(count => count === 1).length + (prevState.pets[petName] ? -1 : 1);
+      const petHoursEntry = petHours.find(pet => pet.petName === petName);
+      const newPetHours = petHoursEntry ? petHoursEntry.hours : 0;
+      const totalPetHours = isExcluded ? prevState.pet_hours : prevState.pet_hours + (prevState.pets[petName] ? -newPetHours : newPetHours);
+      return {
+        ...prevState,
+        pets: {
+          ...prevState.pets,
+          [petName]: prevState.pets[petName] ? 0 : 1
+        },
+        pet_count: newPetCount,
+        pet_hours: totalPetHours
+      };
+    });
   };
 
   const handleConfirm = () => {
@@ -193,6 +202,72 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     "Akkha", "Baba", "Kephri", "Zebak", "Warden"
   ];
 
+  //something off here
+  const petHours = [
+    { petName: "Pet chaos elemental", hours: 3 },
+    { petName: "Pet dagannoth supreme", hours: 57 },
+    { petName: "Pet dagannoth prime", hours: 57 },
+    { petName: "Pet dagannoth rex", hours: 57 },
+    { petName: "Pet penance queen", hours: 308 },
+    { petName: "Pet kree'arra", hours: 100 },
+    { petName: "Pet general graardor", hours: 91 },
+    { petName: "Pet k'ril tsutsaroth", hours: 77 },
+    { petName: "Pet zilyana", hours: 77 },
+    { petName: "Baby mole", hours: 33 },
+    { petName: "Prince black dragon", hours: 25 },
+    { petName: "Kalphite princess", hours: 60 },
+    { petName: "Pet smoke devil", hours: 27 },
+    { petName: "Pet kraken", hours: 30 },
+    { petName: "Pet dark core", hours: 77 },
+    { petName: "Pet snakeling", hours: 91 },
+    { petName: "Chompy chick", hours: 2 },
+    { petName: "Venenatis spiderling", hours: 51 },
+    { petName: "Callisto cub", hours: 43 },
+    { petName: "Vet'ion jr.", hours: 51 },
+    { petName: "Scorpia's offspring", hours: 16 },
+    { petName: "Tzrek-jad", hours: 27 },
+    { petName: "Hellpuppy", hours: 46 },
+    { petName: "Abyssal orphan", hours: 57 },
+    { petName: "Phoenix", hours: 100 },
+    { petName: "Olmlet", hours: 403 },
+    { petName: "Skotos", hours: 65 },
+    { petName: "Jal-nib-rek", hours: 43 },
+    { petName: "Noon", hours: 83 },
+    { petName: "Vorki", hours: 88 },
+    { petName: "Ikkle hydra", hours: 100 },
+    { petName: "Sraracha", hours: 30 },
+    { petName: "Youngllef", hours: 114 },
+    { petName: "Smolcano", hours: 56 },
+    { petName: "Lil' creator", hours: 28 },
+    { petName: "Rift guardian", hours: 68 },
+    { petName: "Beaver", hours: 111 },
+    { petName: "Rock golem", hours: 118 },
+    { petName: "Baby chinchompa", hours: 99 },
+    { petName: "Rocky", hours: 18 },
+    { petName: "Tangleroot", hours: 82 },
+    { petName: "Heron", hours: 84 },
+    { petName: "Giant squirrel", hours: 133 },
+    { petName: "Herbi", hours: 96 },
+    { petName: "Bloodhound", hours: 286 },
+    { petName: "Tiny tempor", hours: 100 },
+    { petName: "Lil' zik", hours: 179 },
+    { petName: "Little nightmare", hours: 187 },
+    { petName: "Nexling", hours: 174 },
+    { petName: "Abyssal protector", hours: 103 },
+    { petName: "Tumeken's guardian", hours: 148 },
+    { petName: "Muphin", hours: 83 },
+    { petName: "Wisp", hours: 95 },
+    { petName: "Butch", hours: 81 },
+    { petName: "Baron", hours: 83 },
+    { petName: "Lil'viathan", hours: 83 },
+    { petName: "Scurry", hours: 50 },
+    { petName: "Smol Heredit", hours: 40 },
+    { petName: "Quetzin", hours: 42 },
+    { petName: "Nid", hours: 33 },
+    { petName: "Huberte", hours: 47 },
+    { petName: "Moxi", hours: 36 }
+  ];
+
   return (
     <Box sx={{ p: '24px'}}>
     {Object.keys(passedPets).length > 0 && (
@@ -249,9 +324,9 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
             <Box sx={{display: 'flex'}}>
               <div style={{ height: "160px", width: "120px" }}>
                 <CircularProgressbar 
-                value={petCount.pet_hours / totalHours} 
+                value={manualMode ? manualPets.pet_hours / totalHours : petCount.pet_hours / totalHours} 
                 maxValue={1} 
-                text={`${petCount.pet_hours}h`}
+                text={`${manualMode ? manualPets.pet_hours : petCount.pet_hours}h`}
                 styles={buildStyles({
                   strokeLinecap: 'round',
                   pathTransitionDuration: 3,
