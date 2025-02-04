@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField, Alert } from '@mui/material';
 import Page from '../components/Page';
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import './Pets.css';
@@ -34,6 +34,9 @@ export default function Pets() {
   const [discordFormatting, setDiscordFormatting] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [importedTable, setImportedTable] = useState('');
+  const [petCountColor, setPetCountColor] = useState('#3a4f5a');
+  const [petHoursColor, setPetHoursColor] = useState('#9acfa3');
+  const [avatarImage, setAvatarImage] = useState<string | null>(null);
 
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const emptyLog: LogCountResponse = {
@@ -160,6 +163,24 @@ export default function Pets() {
     document.documentElement.style.setProperty('--obtained-pet-bg', `linear-gradient(135deg, ${petBgColor1}, ${newColor})`);
   };
 
+  const handlePetCountColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPetCountColor(event.target.value);
+  };
+
+  const handlePetHoursColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setPetHoursColor(event.target.value);
+  };
+
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  };
+
   const handleToggleChange = (event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
     if (newAlignment === 'individual') {
       setIsGroup(false);
@@ -240,7 +261,7 @@ export default function Pets() {
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         <Box sx={{ backgroundColor: '#1b1a1d', width: '304px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1 }}>
-            <Typography variant="h4" sx={{ textAlign: 'center', mt: 3, fontWeight: 600 }}>List Settings</Typography>
+            <Typography variant="h4" sx={{ textAlign: 'center', mt: 3, fontWeight: 600 }}>Pet Settings</Typography>
             <div className="nav-space-divider" />
             <ToggleButtonGroup
               value={isGroup ? 'group' : asciiGen ? 'ascii' : 'individual'}
@@ -317,7 +338,7 @@ export default function Pets() {
                   Include Dusts
                   <Checkbox checked={showDusts} onChange={() => { setShowDusts(!showDusts); }} color="default"/>
                 </Button>
-                <Button variant="contained" onClick={() => { setShowToa(!showToa); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                <Button variant="contained" onClick={() => { setShowToa(!showToa); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
                   <KeyOutlined />
                   Include Toa Transmogs
                   <Checkbox checked={showToa} onChange={() => { setShowToa(!showToa); }} color="default"/>
@@ -325,20 +346,46 @@ export default function Pets() {
                 </>
                 )}
                 {!isLeaderboard && (
-                  <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2}}>
+                  <>
+                  <div className="nav-space-divider" />
+                    <Button variant="contained" className='setting-button' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2 }}>
+                      <ColorLensOutlined />
+                      Pet Bg
+                      <Box>
+                        <input type="color" value={petBgColor1} onChange={handleBgColorChange1} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
+                        <input type="color" value={petBgColor2} onChange={handleBgColorChange2} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
+                      </Box>
+                    </Button>
+                  </>
+                )}
+                <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2, mt: 3}}>
                   <ColorLensOutlined />
-                  Pet Bg
+                  Pet Count Color
                   <Box>
-                    <input type="color" value={petBgColor1} onChange={handleBgColorChange1} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
-                    <input type="color" value={petBgColor2} onChange={handleBgColorChange2} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
+                    <input type="color" value={petCountColor} onChange={handlePetCountColorChange} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
                   </Box>
                 </Button>
-                )}
+                <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2, mt: 3}}>
+                  <ColorLensOutlined />
+                  Pet Hours Color
+                  <Box>
+                    <input type="color" value={petHoursColor} onChange={handlePetHoursColorChange} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
+                  </Box>
+                </Button>
+                <Button variant="contained" component="label" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2,  mt: 3}}>
+                  <UploadFileOutlined />
+                  Upload Avatar
+                  <MoodBadOutlined />
+                  <input type="file" accept="image/*" onChange={handleAvatarUpload} hidden />
+                </Button>
                 {!isGroup && (
-                  <Button variant="contained" className='setting-button' sx={{ mt: 5, display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', height: '75px' }} onClick={onDownloadTable}>
-                    <ContentCopyOutlined />
-                    Download Table
-                  </Button>
+                  <>
+                    <div className="nav-space-divider" />
+                    <Button variant="contained" className='setting-button' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-evenly', height: '75px' }} onClick={onDownloadTable}>
+                      <ContentCopyOutlined />
+                      Download Table
+                    </Button>
+                  </>
                 )}
               </>
             )}
@@ -451,6 +498,9 @@ export default function Pets() {
               manualMode={manualMode}
               kcMode={kcMode}
               ref={ref}
+              petCountColor={petCountColor}
+              petHoursColor={petHoursColor}
+              avatarImage={avatarImage}
             />
           )}
           {isLeaderboard && !asciiGen && (

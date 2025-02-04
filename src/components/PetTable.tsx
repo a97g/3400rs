@@ -34,9 +34,12 @@ interface PetTableProps {
   manualMode: boolean;
   kcMode: boolean;
   ref: RefObject<HTMLDivElement>;
+  petCountColor: string;
+  petHoursColor: string;
+  avatarImage: string | null;
 }
 
-export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref}: PetTableProps) {
+export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, avatarImage }: PetTableProps) {
   const [manualPets, setManualPets] = useState<PetCountResponse>({
     pet_count: 0,
     pet_hours: 0,
@@ -288,11 +291,11 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                 pathTransitionDuration: 3,
 
                 // Colors
-                pathColor: `green`,
-                textColor: 'green',
+                pathColor: petCountColor,
+                textColor: petCountColor,
                 trailColor: '#181818',
                 })}/>
-                <Typography variant="h6" sx={{textAlign: 'center'}}>Pet Count</Typography>
+                <Typography variant="h6" sx={{textAlign: 'center', mt: 1}}>Pet Count</Typography>
               </div>
             </Box>
             </Grid>
@@ -300,7 +303,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
             {!isGroup && (
               <>
               <Grid size={{xs: 4}} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
-                <img src={`https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon'/>
+                <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />
                 <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>
               </Grid>
               </>
@@ -332,12 +335,12 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                   pathTransitionDuration: 3,
 
                   // Colors
-                  pathColor: `red`,
-                  textColor: 'red',
+                  pathColor: petHoursColor,
+                  textColor: petHoursColor,
                   trailColor: '#181818',
                 })}
                 />
-                <Typography variant="h6" sx={{textAlign: 'center'}}>Pet Hours</Typography>
+                <Typography variant="h6" sx={{textAlign: 'center', mt: 1}}>Pet Hours</Typography>
               </div>
             </Box>
             </Grid>
