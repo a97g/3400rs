@@ -372,12 +372,14 @@ export default function Pets() {
                     <input type="color" value={petHoursColor} onChange={handlePetHoursColorChange} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
                   </Box>
                 </Button>
+                {!isGroup && (
                 <Button variant="contained" component="label" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2,  mt: 3}}>
                   <UploadFileOutlined />
                   Upload Avatar
                   <MoodBadOutlined />
                   <input type="file" accept="image/*" onChange={handleAvatarUpload} hidden />
                 </Button>
+                )}
                 {!isGroup && (
                   <>
                     <div className="nav-space-divider" />
