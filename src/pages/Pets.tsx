@@ -259,8 +259,8 @@ export default function Pets() {
   return (
     <Page title="Pet List Generator | 34rs">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-        <Box sx={{ backgroundColor: '#1b1a1d', width: '304px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1 }}>
+        <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1,  }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>
             <Typography variant="h4" sx={{ textAlign: 'center', mt: 3, fontWeight: 600 }}>Pet Settings</Typography>
             <div className="nav-space-divider" />
             <ToggleButtonGroup
@@ -348,9 +348,11 @@ export default function Pets() {
                 {!isLeaderboard && (
                   <>
                   <div className="nav-space-divider" />
-                    <Button variant="contained" className='setting-button' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2 }}>
+                    <Button variant="contained" className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2, flexGrow: '0' }}>
                       <ColorLensOutlined />
+                      <Box />
                       Pet Bg
+                      <Box />
                       <Box>
                         <input type="color" value={petBgColor1} onChange={handleBgColorChange1} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
                         <input type="color" value={petBgColor2} onChange={handleBgColorChange2} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
@@ -360,14 +362,18 @@ export default function Pets() {
                 )}
                 <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2, mt: 3}}>
                   <ColorLensOutlined />
+                <Box />
                   Pet Count Color
+                  <Box />
                   <Box>
                     <input type="color" value={petCountColor} onChange={handlePetCountColorChange} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
                   </Box>
                 </Button>
                 <Button variant="contained" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2, mt: 3}}>
                   <ColorLensOutlined />
+                  <Box />
                   Pet Hours Color
+                  <Box />
                   <Box>
                     <input type="color" value={petHoursColor} onChange={handlePetHoursColorChange} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
                   </Box>
@@ -411,9 +417,9 @@ export default function Pets() {
           </Box> */}
         </Box>
 
-        <Container maxWidth="lg" sx={{padding: '0 !important'}}>
-          <Box className="banner-box">
-            <Box sx={{ display: 'flex', maxwidth: '700px', alignItems: 'flex-end', pl: 3 }}>
+        <Box sx={{ flexGrow: 1, padding: '0 !important' }}>
+          <Box className="banner-box" sx={{ width: '100%' }}>
+            <Box sx={{ display: 'flex', maxWidth: '700px', alignItems: 'flex-end', pl: 3 }}>
               <img src={goldavi} width="125px" height="125px" alt="gold trophy" />
               <Box>
                 <Typography sx={{ ml: 2, fontWeight: '500' }} variant='h4'>{asciiGen ? 'Ascii' : isGroup ? isLeaderboard ?  'Leaderboard' : 'Group' : 'Individual' }  Pet List Generator</Typography>
@@ -486,24 +492,26 @@ export default function Pets() {
           <div className="nav-space-divider" />
           {/* <Box sx={{minWidth: '1400px'}}></Box> */}
           {!isLeaderboard && !asciiGen && (
-            <PetTable 
-              totalPets={totalPets}
-              totalHours={totalHours}
-              petCounts={petCounts} 
-              transmogs={transmogs}
-              isGroup={isGroup} 
-              missingMode={missingMode} 
-              detailedMode={isDetailed} 
-              showDusts={showDusts}
-              showToa={showToa}
-              combinedMissing={combinedMissing} 
-              manualMode={manualMode}
-              kcMode={kcMode}
-              ref={ref}
-              petCountColor={petCountColor}
-              petHoursColor={petHoursColor}
-              avatarImage={avatarImage}
-            />
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <PetTable 
+                totalPets={totalPets}
+                totalHours={totalHours}
+                petCounts={petCounts} 
+                transmogs={transmogs}
+                isGroup={isGroup} 
+                missingMode={missingMode} 
+                detailedMode={isDetailed} 
+                showDusts={showDusts}
+                showToa={showToa}
+                combinedMissing={combinedMissing} 
+                manualMode={manualMode}
+                kcMode={kcMode}
+                ref={ref}
+                petCountColor={petCountColor}
+                petHoursColor={petHoursColor}
+                avatarImage={avatarImage}
+              />
+            </Box>
           )}
           {isLeaderboard && !asciiGen && (
             <PetLeaderboard 
@@ -515,7 +523,7 @@ export default function Pets() {
           {asciiGen && (
             <AsciiGenerator discordFormat={discordFormatting} importedTable={importedTable} />
           )}
-        </Container>
+        </Box>
       </Box>
 
       <Dialog open={importDialogOpen} onClose={handleImportDialogClose}>

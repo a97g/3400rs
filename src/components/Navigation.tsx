@@ -26,7 +26,7 @@ export function Navigation() {
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <Box style={{ marginBottom: '10px', marginTop: '16px', marginLeft: '10px', marginRight: '10px' }}>
+          <Box style={{ marginBottom: '10px', marginTop: '16px', marginLeft: '10px', marginRight: '10px', flexGrow: '0' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <img src={nav3400rs} alt="icon" />
             </div>

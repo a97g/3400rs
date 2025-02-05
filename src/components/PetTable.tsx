@@ -276,11 +276,10 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     {Object.keys(passedPets).length > 0 && (
       Object.entries(passedPets).map(([key, petCount]) => (
         <div key={key}>
-        <Box ref={ref}>
-          {isGroup && <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>}
+        <Box ref={ref} sx={{display: 'flex', justifyContent: 'center'}}>
             <Grid container className="pet-container">
             <Grid size={{xs: 4 }} sx={{display: 'flex', justifyContent: 'center'}}>
-            <Box sx={{display: 'flex'}}>
+            <Box sx={{display: 'flex', flexGrow: '0'}}>
               <div style={{ height: "160px", width: "120px" }}>
                 <CircularProgressbar 
                 value={manualMode ? manualPets.pet_count / totalPets : petCount.pet_count / totalPets} 
@@ -311,20 +310,24 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
 
             {isGroup && (
             <Grid size={{xs: 4}} sx={{display: 'flex', justifyContent: 'center'}}>
-              <Box sx={{display: 'flex', position: 'relative'}}>
+              <Box sx={{display: 'flex', flexDirection: 'column'}}>
+              <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>
+              <Box sx={{display: 'flex', justifyContent: 'center', position: 'relative', flexGrow: 0}}>
                 <div style={{ height: "170px", width: "200px" }}>
                   {petCount.rank <= 3 && (
-                    <img src={getTrophyImage(petCount.rank) || silverTrophy} alt="trophy" style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '150px', zIndex: '0' }} />
+                    <img src={getTrophyImage(petCount.rank) || silverTrophy} alt="trophy" style={{ position: 'absolute', top: 0, width: '200px', height: '150px', zIndex: '0' }} />
                   )}
                 <Typography variant="h6" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>Rank</Typography>
                 <Typography variant="h1" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>{petCount.rank}</Typography>
                 </div>
               </Box>
+              
+              </Box>
             </Grid>
             )}
 
             <Grid size={{xs: 4 }} sx={{display: 'flex', justifyContent: 'center'}}>
-            <Box sx={{display: 'flex'}}>
+            <Box sx={{display: 'flex', flexGrow: '0'}}>
               <div style={{ height: "160px", width: "120px" }}>
                 <CircularProgressbar 
                 value={manualMode ? manualPets.pet_hours / totalHours : petCount.pet_hours / totalHours} 

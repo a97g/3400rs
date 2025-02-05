@@ -3,6 +3,10 @@
   --obtained-pet-bg: linear-gradient(135deg, #492023, #463827);
 }
 
+.MuiBox-root{
+    flex-grow: 1;
+} 
+
 .pet-grid {
     display: flex;
     flex-wrap: wrap; /* Ensure the items wrap properly on smaller screens */
@@ -64,6 +68,7 @@
     padding: 2em; /* Optional: Add some padding inside the container */
     gap: 1em 2em;
     margin-bottom: 1em;
+    max-width: 1074px;
 }
 
 .leaderboard-container {
@@ -111,9 +116,9 @@
 
 .banner-box {
     height: 300px;
-    width: '1168px !important';
+    /* width: '1168px !important'; */
     background-color: '#141316';
-    margin-left: -16px;
+    /* margin-left: -16px; */
     background-image: linear-gradient(to top, #141316, rgba(24, 24, 24, 0)), url(../resources/background/bg.png);
     background-size: 100%;
     background-repeat: no-repeat;
