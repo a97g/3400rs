@@ -67,3 +67,4 @@ export { default as Baba } from './Baba.png';
 export { default as Kephri } from './Kephri.png';
 export { default as Zebak } from './Zebak.png';
 export { default as Warden } from './Warden.png';
+export { default as Bran } from './Bran.png';

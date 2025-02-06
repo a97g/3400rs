@@ -1,11 +1,13 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Button, Container, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField, Alert } from '@mui/material';
+import { Box, Button, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField, Alert, Zoom } from '@mui/material';
 import Page from '../components/Page';
+import nav3400rs from "../resources/nav/nav3400rs.png";
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
+import Temple from '../resources/pets/assets/temple.svg';
 import './Pets.css';
 import PetTable from '../components/PetTable';
 import PetLeaderboard from '../components/PetLeaderboard';
@@ -13,8 +15,8 @@ import AsciiGenerator from '../components/AsciiGenerator';
 import { toPng } from 'html-to-image';
 
 export default function Pets() {
-  const totalPets = 62;
-  const totalHours = 5270;
+  const totalPets = 63;
+  const totalHours = 5370;
 
   const [group, setGroup] = useState('2394');
   const [player, setPlayer] = useState('3400');
@@ -37,6 +39,10 @@ export default function Pets() {
   const [petCountColor, setPetCountColor] = useState('#3a4f5a');
   const [petHoursColor, setPetHoursColor] = useState('#9acfa3');
   const [avatarImage, setAvatarImage] = useState<string | null>(null);
+  const [missingSettingsOpen, setMissingSettingsOpen] = useState(false);
+  const [imageSettingsOpen, setImageSettingsOpen] = useState(false);
+  const [colorSettingsOpen, setColorSettingsOpen] = useState(false);
+
 
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const emptyLog: LogCountResponse = {
@@ -256,12 +262,19 @@ export default function Pets() {
     }
   };
 
+  const handleTempleClick = () => {
+    window.location.href='https://templeosrs.com/'
+  };
+
   return (
     <Page title="Pet List Generator | 34rs">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1,  }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>
-            <Typography variant="h4" sx={{ textAlign: 'center', mt: 3, fontWeight: 600 }}>Pet Settings</Typography>
+            <Box sx={{display:'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mt: 3}}>
+            <img src={nav3400rs} alt="icon" className="icon"/>
+            <Typography variant="h5" sx={{ textAlign: 'center',  fontWeight: 600 }}>Pet List Tools</Typography>
+            </Box>
             <div className="nav-space-divider" />
             <ToggleButtonGroup
               value={isGroup ? 'group' : asciiGen ? 'ascii' : 'individual'}
@@ -298,24 +311,8 @@ export default function Pets() {
                     </Button>
                   </>
                 )}
-                {!manualMode && (
-                  <>
-                    <div className="nav-space-divider" />
-                    <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <SentimentDissatisfiedOutlined />
-                      Only Missing
-                      <Checkbox checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default"className="settings-toggle" />
-                    </Button>
-                    <Button variant="contained" onClick={() => { setCombinedMissing(!combinedMissing);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <JoinFull />
-                      Combine Missing
-                      <Checkbox checked={combinedMissing} onChange={() => setCombinedMissing(!combinedMissing)} color="default" className="settings-toggle"/>
-                    </Button>
-                  </>
-                )}
                 {isGroup && (
-                  <>
-                <div className="nav-space-divider" />
+                <>
                 <Button variant="contained" onClick={() => { setIsLeaderboard(!isLeaderboard); setMissingMode(false); } } className='setting-button settings-toggle' disabled={!isGroup ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <LeaderboardOutlined />
                     Leaderboard Mode
@@ -323,31 +320,84 @@ export default function Pets() {
                 </Button>
                 </>
                 )}
-                  <div className="nav-space-divider" />
-                {!isLeaderboard && (
-                <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-                  <DetailsOutlined />
-                  Detailed Sprites
-                  <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
-                </Button>
-                )}
-                {!isGroup && !isLeaderboard && (
+                {!manualMode && (
                   <>
-                <Button variant="contained" onClick={() => { setShowDusts(!showDusts); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-                  <FilterHdrOutlined />
-                  Include Dusts
-                  <Checkbox checked={showDusts} onChange={() => { setShowDusts(!showDusts); }} color="default"/>
-                </Button>
-                <Button variant="contained" onClick={() => { setShowToa(!showToa); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
-                  <KeyOutlined />
-                  Include Toa Transmogs
-                  <Checkbox checked={showToa} onChange={() => { setShowToa(!showToa); }} color="default"/>
-                </Button>
-                </>
+                  <Button variant="outlined" className="dropdown-button" sx={{border: 0, mb: 2, mt: 1, display: 'flex', justifyContent: 'space-between', color: '#656566', "&:hover": {backgroundColor: "#1b1a1d"},"&:active": {backgroundColor: "#1b1a1d"}}} onClick={() => {setMissingSettingsOpen(!missingSettingsOpen);}} disableRipple>
+                    <Typography>
+                    Missing Settings
+                    </Typography>
+                    <ExpandMore sx={{ transform: missingSettingsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}/>
+                  </Button>
+                  {missingSettingsOpen && (
+                    <Zoom in={missingSettingsOpen} style={{ transitionDelay: missingSettingsOpen ? '100ms' : '0ms' }}>
+                      <Box sx={{display: 'flex', justifyContent: 'space-between', flexDirection: 'column'}}>
+                        <Button variant="contained" onClick={() => { setMissingMode(!missingMode);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <SentimentDissatisfiedOutlined />
+                          Only Missing
+                          <Checkbox checked={missingMode} onChange={() => setMissingMode(!missingMode)} color="default"className="settings-toggle" />
+                        </Button>
+                        <Button variant="contained" onClick={() => { setCombinedMissing(!combinedMissing);}} className='setting-button' disabled={isLeaderboard ? true : false} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <JoinFull />
+                          Combine Missing
+                          <Checkbox checked={combinedMissing} onChange={() => setCombinedMissing(!combinedMissing)} color="default" className="settings-toggle"/>
+                        </Button>
+                      </Box>
+                    </Zoom>
+                  )}
+                  </>
                 )}
+                  <Button variant="outlined" className="dropdown-button" sx={{border: 0, mb: 2, mt: 1, display: 'flex', justifyContent: 'space-between', color: '#656566', "&:hover": {backgroundColor: "#1b1a1d"},"&:active": {backgroundColor: "#1b1a1d"}}} onClick={() => {setImageSettingsOpen(!imageSettingsOpen);}} disableRipple>
+                    <Typography>
+                    Image Settings
+                    </Typography>
+                    <ExpandMore sx={{ transform: imageSettingsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}/>
+                  </Button>
+                  {imageSettingsOpen && (
+                    <Zoom in={imageSettingsOpen} style={{ transitionDelay: imageSettingsOpen ? '100ms' : '0ms' }}>
+                      <Box sx={{display: 'flex', justifyContent: 'space-between', flexDirection: 'column'}}>
+                      {!isLeaderboard && (
+                      <Button variant="contained" onClick={() => { setIsDetailed(!isDetailed); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                        <DetailsOutlined />
+                        Detailed Sprites
+                        <Checkbox checked={isDetailed} onChange={() => { setIsDetailed(!isDetailed); }} color="default"/>
+                      </Button>
+                      )}
+                      {!isGroup && !isLeaderboard && (
+                        <>
+                      <Button variant="contained" onClick={() => { setShowDusts(!showDusts); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                        <FilterHdrOutlined />
+                        Include Dusts
+                        <Checkbox checked={showDusts} onChange={() => { setShowDusts(!showDusts); }} color="default"/>
+                      </Button>
+                      <Button variant="contained" onClick={() => { setShowToa(!showToa); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                        <KeyOutlined />
+                        Include Toa Transmogs
+                        <Checkbox checked={showToa} onChange={() => { setShowToa(!showToa); }} color="default"/>
+                      </Button>
+                      </>
+                      )}
+                      {!isGroup && (
+                      <Button variant="contained" component="label" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2,  mt: 3}}>
+                        <UploadFileOutlined />
+                        Upload Avatar
+                        <MoodBadOutlined />
+                        <input type="file" accept="image/*" onChange={handleAvatarUpload} hidden />
+                      </Button>
+                      )}
+                    </Box>
+                  </Zoom> 
+                )}
+                  <Button variant="outlined" className="dropdown-button" sx={{border: 0, mb: 2, mt: 1, display: 'flex', justifyContent: 'space-between', color: '#656566', "&:hover": {backgroundColor: "#1b1a1d"},"&:active": {backgroundColor: "#1b1a1d"}}} onClick={() => {setColorSettingsOpen(!colorSettingsOpen);}} disableRipple>
+                    <Typography>
+                    Color Settings
+                    </Typography>
+                    <ExpandMore sx={{ transform: colorSettingsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}/>
+                  </Button>
+                {colorSettingsOpen && (
+                    <Zoom in={colorSettingsOpen} style={{ transitionDelay: colorSettingsOpen ? '100ms' : '0ms' }}>
+                      <Box sx={{display: 'flex', justifyContent: 'space-between', flexDirection: 'column'}}>
                 {!isLeaderboard && (
                   <>
-                  <div className="nav-space-divider" />
                     <Button variant="contained" className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2, flexGrow: '0' }}>
                       <ColorLensOutlined />
                       <Box />
@@ -378,14 +428,9 @@ export default function Pets() {
                     <input type="color" value={petHoursColor} onChange={handlePetHoursColorChange} style={{ marginLeft: '10px', borderRadius: '90px', width: '30px', cursor: 'pointer', backgroundColor: '#242328', border: 0 }} />
                   </Box>
                 </Button>
-                {!isGroup && (
-                <Button variant="contained" component="label" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2,  mt: 3}}>
-                  <UploadFileOutlined />
-                  Upload Avatar
-                  <MoodBadOutlined />
-                  <input type="file" accept="image/*" onChange={handleAvatarUpload} hidden />
-                </Button>
-                )}
+                </Box>
+                </Zoom> 
+              )}
                 {!isGroup && (
                   <>
                     <div className="nav-space-divider" />
@@ -410,11 +455,19 @@ export default function Pets() {
               </>
             )}
           </Box>
-          {/* <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1 }}>
-            <Box>
-              <Button variant="outlined">Settings</Button>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: 0 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+              <Button variant="outlined" sx={{border: 0}} onClick={handleTempleClick}>
+                <img src={Temple} alt="temple" className="temple"/>
+              </Button>
+              <Button variant="outlined" sx={{border: 0}}>
+                <img src={Temple} alt="temple" className="temple"/>
+              </Button>
+              <Button variant="outlined" sx={{border: 0}}>
+                <img src={Temple} alt="temple" className="temple"/>
+              </Button>
             </Box>
-          </Box> */}
+          </Box> 
         </Box>
 
         <Box sx={{ flexGrow: 1, padding: '0 !important' }}>

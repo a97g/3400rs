@@ -13,6 +13,15 @@
     gap: 10px; /* Space between images */
 }
 
+.icon {
+    -webkit-filter: drop-shadow(4.0px 0.0px 0 #0f0f0f)
+                    drop-shadow(-0.0px 0.0px 0 #0f0f0f)
+                    drop-shadow(4.0px -0.0px 0 #0f0f0f)
+                    drop-shadow(-0.0px -0.0px 0 #0f0f0f);
+    height: 80px;
+    width: 140px
+}
+
 /* Styling for each pet icon container */
 .pet-icon {
     width: 40px; /* Set width of the box to 40px */
@@ -148,4 +157,14 @@ charIcon {
     width: 100px;
     border-radius: 50%;
     transform: translateZ(0);
+}
+
+.nav-space-divider {
+    height: 1px;
+    background-color: #2b2f30; /* Color of the line */
+    margin: 1em 0;
+  }
+
+.temple {
+    width: 50px;
 }
