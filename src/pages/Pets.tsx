@@ -8,6 +8,8 @@ import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissat
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import Temple from '../resources/pets/assets/temple.svg';
+import Clog from '../resources/pets/assets/clog.webp';
+import Hiscores from '../resources/pets/assets/hiscores.png';
 import './Pets.css';
 import PetTable from '../components/PetTable';
 import PetLeaderboard from '../components/PetLeaderboard';
@@ -262,8 +264,14 @@ export default function Pets() {
     }
   };
 
-  const handleTempleClick = () => {
-    window.location.href='https://templeosrs.com/'
+  const handleSiteClick = (site: string) => {
+    if (site === 'Temple') {
+      window.location.href='https://templeosrs.com/'
+    } else if(site === 'Hiscores' ) {
+      window.location.href='https://secure.runescape.com/m=hiscore_oldschool/overall'
+    } else if (site === 'Clog') {
+      window.location.href='https://collectionlog.net/recent-items'
+      }
   };
 
   return (
@@ -444,27 +452,27 @@ export default function Pets() {
             )}
             {asciiGen && (
               <>
-                <Button variant="contained" onClick={() => { setDiscordFormatting(!discordFormatting); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                <Button variant="contained" onClick={() => { setDiscordFormatting(!discordFormatting); }} className='setting-button settings-toggle' sx={{ mb: 3, flewGrow: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
                   <ContentPasteGoOutlined />
                   Discord Formatting
                   <Checkbox checked={discordFormatting} onChange={() => { setDiscordFormatting(!discordFormatting); }} color="default"/>
                 </Button>
                 <Button variant="contained" onClick={handleImportDialogOpen} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center' }} >
-                  Import Old Table
+                  Import Old Table - WIP
                 </Button>
               </>
             )}
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: 0 }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-              <Button variant="outlined" sx={{border: 0}} onClick={handleTempleClick}>
+              <Button variant="outlined" sx={{border: 0}} onClick={() => handleSiteClick('Temple')}>
                 <img src={Temple} alt="temple" className="temple"/>
               </Button>
-              <Button variant="outlined" sx={{border: 0}}>
-                <img src={Temple} alt="temple" className="temple"/>
+              <Button variant="outlined" sx={{border: 0}} onClick={() => handleSiteClick('Hiscores')}>
+                <img src={Hiscores} alt="temple" className="temple"/>
               </Button>
-              <Button variant="outlined" sx={{border: 0}}>
-                <img src={Temple} alt="temple" className="temple"/>
+              <Button variant="outlined" sx={{border: 0}} onClick={() => handleSiteClick('Clog')}>
+                <img src={Clog} alt="temple" className="temple"/>
               </Button>
             </Box>
           </Box> 
