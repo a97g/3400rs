@@ -136,7 +136,7 @@ export default function AsciiGenerator({ discordFormat, importedTable }: { disco
     const rsnLine = lines[1].trim();
     const rsn = rsnLine.substring(1, rsnLine.length - 1).trim();
     const newRows = lines.slice(5, -1).map((line, index) => {
-      const [indexStr, pet, kc, date] = line.split('║').map(cell => cell.trim());
+      const [pet, kc, date] = line.split('║').map(cell => cell.trim());
       return { id: index + 1, pet, kc, date: new Date(date), isNew: false };
     });
     setRsn(rsn);

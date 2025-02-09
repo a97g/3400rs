@@ -5,7 +5,6 @@ import goldTrophy from '../resources/pets/assets/gold.png';
 import silverTrophy from '../resources/pets/assets/silver.png';
 import bronzeTrophy from '../resources/pets/assets/bronze.png';
 import * as InvyPet from '../resources/pets/inv';
-import * as DetailedPet from '../resources/pets/detailed';
 import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 
 interface PetData {

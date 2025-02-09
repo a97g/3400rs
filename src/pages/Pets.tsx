@@ -222,6 +222,7 @@ export default function Pets() {
     setImportedTable(event.target.value);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleImportTable = () => {
     // Process the imported table and populate the fields in AsciiGenerator
     // Strip unneeded spaces and ASCII characters
@@ -256,7 +257,7 @@ export default function Pets() {
       .catch((err) => {
         console.log(err)
       })
-  }, [ref])
+  }, [ref, player])
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
