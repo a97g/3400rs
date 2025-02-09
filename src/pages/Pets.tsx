@@ -98,23 +98,20 @@ export default function Pets() {
   }
 
   const getPetCount = async () => {
+    const proxyUrl = 'https://api.allorigins.win/raw?url=';
     const url = 'https://templeosrs.com/api/pets/pet_count.php';
     const urlLog = 'https://templeosrs.com/api/collection-log/player_collections.php';
-
-    const params = isGroup
-      ? { group: group, count: 200 }
-      : { player: player, count: 200 };
   
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': '*',
-      'Access-Control-Allow-Methods': '*',
-    };
+    const params = new URLSearchParams(
+      isGroup
+        ? { group: group, count: '200' }
+        : { player: player, count: '200' }
+    );
   
     try {
       if (!isGroup) {
-        const responseLog = await axios.get<{ data: { [key: string]: LogCountResponse } }>(urlLog, { headers, params });
-        if (responseLog && responseLog.data && responseLog.data.data) {
+        const responseLog = await axios.get(proxyUrl + encodeURIComponent(urlLog + '?' + new URLSearchParams(params).toString()));
+        if (responseLog && responseLog.data) {
           setLogCount(responseLog.data.data);
         } else {
           setRsnError(true);
@@ -124,8 +121,8 @@ export default function Pets() {
         }
       }
       
-      const response = await axios.get<{ data: { [key: string]: PetCountResponse } }>(url, { params, headers });
-      if (response && response.data && response.data.data) {
+      const response = await axios.get(proxyUrl + encodeURIComponent(url + '?' + new URLSearchParams(params).toString()));
+      if (response && response.data) {
         setPetCounts(response.data.data);
       } else {
         setRsnError(true);
