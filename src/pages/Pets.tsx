@@ -104,10 +104,16 @@ export default function Pets() {
     const params = isGroup
       ? { group: group, count: 200 }
       : { player: player, count: 200 };
-
+  
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': '*',
+      'Access-Control-Allow-Methods': '*',
+    };
+  
     try {
       if (!isGroup) {
-        const responseLog = await axios.get<{ data: { [key: string]: LogCountResponse } }>(urlLog, { params });
+        const responseLog = await axios.get<{ data: { [key: string]: LogCountResponse } }>(urlLog, { headers, params });
         if (responseLog && responseLog.data && responseLog.data.data) {
           setLogCount(responseLog.data.data);
         } else {
@@ -118,7 +124,7 @@ export default function Pets() {
         }
       }
       
-      const response = await axios.get<{ data: { [key: string]: PetCountResponse } }>(url, { params });
+      const response = await axios.get<{ data: { [key: string]: PetCountResponse } }>(url, { params, headers });
       if (response && response.data && response.data.data) {
         setPetCounts(response.data.data);
       } else {
