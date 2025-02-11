@@ -279,7 +279,7 @@ export default function Pets() {
   };
 
   return (
-    <Page title="Pet List Generator | 34rs">
+    <Page title="3400 Pet List Tools">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1,  }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>

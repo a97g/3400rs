@@ -32,7 +32,6 @@ export default function PetLeaderboard({ totalPets, totalHours, petCounts }: Pet
   const remaining = Object.values(petCounts).sort((a, b) => a.rank - b.rank).slice(3);
 
   const getMissingPets = (pets: PetData) => {
-    console.log(Object.keys(pets).filter(petName => !pets[petName]))
     return Object.keys(pets).filter(petName => !pets[petName]);
   };
 
