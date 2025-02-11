@@ -34,6 +34,7 @@
     align-items: center;
     justify-content: center; /* Center the image inside the box */
     transition: background-color 0.3s ease; /* Smooth transition for hover effects */
+    flex-grow: 0 !important;
 }
 
 /* Make the images inside the pet-icon boxes 29x29 */
@@ -96,6 +97,7 @@
     align-items: center;
     justify-content: center; /* Center the image inside the box */
     transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
+    flex-grow: 0;
 }
 
 /* Make the images inside the obtained pet-icon boxes 29x29 */

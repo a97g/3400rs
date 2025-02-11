@@ -98,7 +98,7 @@ export default function Pets() {
   }
 
   const getPetCount = async () => {
-    const proxyUrl = 'https://api.allorigins.win/raw?url=';
+    const proxyUrl = 'https://corsproxy.io/?';
     const url = 'https://templeosrs.com/api/pets/pet_count.php';
     const urlLog = 'https://templeosrs.com/api/collection-log/player_collections.php';
   
@@ -110,7 +110,7 @@ export default function Pets() {
   
     try {
       if (!isGroup) {
-        const responseLog = await axios.get(proxyUrl + encodeURIComponent(urlLog + '?' + new URLSearchParams(params).toString()));
+        const responseLog = await axios.get(proxyUrl + encodeURIComponent(urlLog + '?' + params.toString()));
         if (responseLog && responseLog.data) {
           setLogCount(responseLog.data.data);
         } else {
@@ -121,7 +121,7 @@ export default function Pets() {
         }
       }
       
-      const response = await axios.get(proxyUrl + encodeURIComponent(url + '?' + new URLSearchParams(params).toString()));
+      const response = await axios.get(proxyUrl + encodeURIComponent(url + '?' + params.toString()));
       if (response && response.data) {
         setPetCounts(response.data.data);
       } else {
