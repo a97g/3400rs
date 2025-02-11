@@ -1,5 +1,5 @@
 import React, { useState, useEffect, RefObject } from 'react';
-import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import * as InvyPet from '../resources/pets/inv';
@@ -125,6 +125,46 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     }));
   };
 
+  const handleExportPetData = () => {
+    const exportedData = Object.keys(passedPets).reduce((acc, key) => {
+      const petCount = passedPets[key];
+      const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
+      const petData = obtainedPets.reduce((petAcc, petName) => {
+        petAcc[petName] = kcValues[petName] || 0;
+        return petAcc;
+      }, {} as { [key: string]: string | number });
+      acc[key] = petData;
+      return acc;
+    }, {} as { [key: string]: { [key: string]: string | number } });
+  
+    navigator.clipboard.writeText(JSON.stringify(exportedData))
+      .then(() => {
+        alert('Pet data copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Failed to copy pet data: ', err);
+      });
+  };
+
+  const handleImportPetData = () => {
+    navigator.clipboard.readText()
+      .then(text => {
+        const importedData = JSON.parse(text);
+        const newKcValues = Object.keys(importedData).reduce((acc, key) => {
+          const petData = importedData[key];
+          Object.keys(petData).forEach(petName => {
+            acc[petName] = petData[petName].toString();
+          });
+          return acc;
+        }, {} as { [key: string]: string });
+        setKcValues(newKcValues);
+        alert('Pet data imported successfully!');
+      })
+      .catch(err => {
+        console.error('Failed to read pet data from clipboard: ', err);
+      });
+  };
+
   const renderPetBox = (petName: string, pets: PetData) => {
     const petIconClass = getPetIconClass(petName, pets);
     if (missingMode && petIconClass === 'obtained-pet-icon') {
@@ -200,7 +240,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     "Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring",
     "Olmlet", "Lil' zik", "Tumeken's guardian",
     "Pet penance queen", "Phoenix", "Smolcano", "Tiny tempor", "Abyssal protector",
-    "Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin",
+    "Pet snakeling", "Chompy chick", "Skotos", "Herbi", "Bloodhound", "Quetzin","Bran",
     "Metamorphic Dust", "Sanguine Dust",
     "Akkha", "Baba", "Kephri", "Zebak", "Warden"
   ];
@@ -420,6 +460,10 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
           {kcMode && (
             <>
             <Typography variant='h4' sx={{fontWeight: 500, textAlign: 'center'}}>KC Mode</Typography>
+            <Box sx={{display: 'flex', mb: 2, justifyContent: 'space-evenly'}}>
+              <Button variant="contained" className='setting-button settings-toggle' onClick={handleImportPetData}>Import KC Data</Button>
+              <Button variant="contained" className='setting-button settings-toggle' onClick={handleExportPetData}>Export KC Data</Button>
+            </Box>
             <Box sx={{display: 'flex', justifyContent: 'center'}}>
               <TableContainer component={Paper} className="pet-container" sx={{ mt: 3, backgroundColor: '#0f0f0f' }}>
                 <Table>
