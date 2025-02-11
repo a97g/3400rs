@@ -1,5 +1,5 @@
 import React, { useState, useEffect, RefObject } from 'react';
-import { Box, Typography, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import * as InvyPet from '../resources/pets/inv';
@@ -47,7 +47,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     player: '',
     rank: 0
   });
-  const [confirmed, setConfirmed] = useState(false);
+  // const [confirmed, setConfirmed] = useState(false);
   const [kcValues, setKcValues] = useState<{ [key: string]: string }>({});
   const [passedPets, setPassedPets] = useState(petCounts);
 
@@ -114,9 +114,9 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     });
   };
 
-  const handleConfirm = () => {
-    setConfirmed(true);
-  };
+  // const handleConfirm = () => {
+  //   setConfirmed(true);
+  // };
 
   const handleKcChange = (petName: string, value: string) => {
     setKcValues(prevState => ({
@@ -417,15 +417,11 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               )}
             </Grid>
           </Box>
-          {manualMode && !confirmed && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <Button variant="contained" onClick={handleConfirm} className="setting-button">Manually Generate List</Button>
-            </Box>
-          )}
           {kcMode && (
             <>
-              <Typography variant='h4' sx={{fontWeight: 500, textAlign: 'center'}}>KC Mode</Typography>
-              <TableContainer component={Paper} className="pet-container" sx={{ mt: 3, backgroundColor: '#0f0f0f'}}>
+            <Typography variant='h4' sx={{fontWeight: 500, textAlign: 'center'}}>KC Mode</Typography>
+            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+              <TableContainer component={Paper} className="pet-container" sx={{ mt: 3, backgroundColor: '#0f0f0f' }}>
                 <Table>
                   <TableHead>
                     <TableRow>
@@ -459,6 +455,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                   </TableBody>
                 </Table>
               </TableContainer>
+            </Box>
             </>
           )}
         </div>
