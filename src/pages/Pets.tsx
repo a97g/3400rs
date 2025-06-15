@@ -4,7 +4,7 @@ import { Box, Button, Divider, IconButton, InputBase, Paper, Tooltip, Typography
 import Page from '../components/Page';
 import nav3400rs from "../resources/nav/nav3400rs.png";
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, BadgeOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import Temple from '../resources/pets/assets/temple.svg';
@@ -44,7 +44,7 @@ export default function Pets() {
   const [missingSettingsOpen, setMissingSettingsOpen] = useState(false);
   const [imageSettingsOpen, setImageSettingsOpen] = useState(false);
   const [colorSettingsOpen, setColorSettingsOpen] = useState(false);
-
+  const [isCompact, setIsCompact] = useState(false);
 
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const emptyLog: LogCountResponse = {
@@ -381,13 +381,18 @@ export default function Pets() {
                         Include Dusts
                         <Checkbox checked={showDusts} onChange={() => { setShowDusts(!showDusts); }} color="default"/>
                       </Button>
-                      <Button variant="contained" onClick={() => { setShowToa(!showToa); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                      <Button variant="contained" onClick={() => { setShowToa(!showToa); }} className='setting-button settings-toggle' sx={{ mb: 3,display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
                         <KeyOutlined />
                         Include Toa Transmogs
                         <Checkbox checked={showToa} onChange={() => { setShowToa(!showToa); }} color="default"/>
                       </Button>
                       </>
                       )}
+                      <Button variant="contained" onClick={() => { setIsCompact(!isCompact); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                      <BadgeOutlined />
+                      Alternate Name Format
+                      <Checkbox checked={isCompact} onChange={() => { setIsCompact(!isCompact); }} color="default"/>
+                      </Button>
                       {!isGroup && (
                       <Button variant="contained" component="label" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2,  mt: 3}}>
                         <UploadFileOutlined />
@@ -575,6 +580,7 @@ export default function Pets() {
                 petCountColor={petCountColor}
                 petHoursColor={petHoursColor}
                 avatarImage={avatarImage}
+                isCompact={isCompact}
               />
             </Box>
           )}

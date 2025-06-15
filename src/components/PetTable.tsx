@@ -7,6 +7,7 @@ import * as DetailedPet from '../resources/pets/detailed';
 import goldTrophy from '../resources/pets/assets/goldped.png';
 import silverTrophy from '../resources/pets/assets/silverped.png';
 import bronzeTrophy from '../resources/pets/assets/bronzeped.png';
+import otherTrophy from '../resources/pets/assets/otherped.png';
 import DefaultIcon from '../resources/pets/assets/chat.png';
 
 interface PetData {
@@ -38,9 +39,10 @@ interface PetTableProps {
   petCountColor: string;
   petHoursColor: string;
   avatarImage: string | null;
+  isCompact?: boolean;
 }
 
-export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, avatarImage }: PetTableProps) {
+export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, avatarImage, isCompact }: PetTableProps) {
   const [manualPets, setManualPets] = useState<PetCountResponse>({
     pet_count: 0,
     pet_hours: 0,
@@ -321,6 +323,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
         <div key={key}>
         <Box ref={ref} sx={{display: 'flex', justifyContent: 'center'}}>
             <Grid container className="pet-container">
+            {!isCompact ? 
+            <Box sx={{display: 'flex', alignItems: 'center', width: '100%'}}>
             <Grid size={{xs: 4 }} sx={{display: 'flex', justifyContent: 'center'}}>
             <Box sx={{display: 'flex', flexGrow: '0'}}>
               <div style={{ height: "160px", width: "120px" }}>
@@ -358,9 +362,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>
               <Box sx={{display: 'flex', justifyContent: 'center', position: 'relative', flexGrow: 0}}>
                 <div style={{ height: "170px", width: "200px" }}>
-                  {petCount.rank <= 3 && (
-                    <img src={getTrophyImage(petCount.rank) || silverTrophy} alt="trophy" style={{ position: 'absolute', top: 0, width: '200px', height: '150px', zIndex: '0' }} />
-                  )}
+                <img src={getTrophyImage(petCount.rank) || otherTrophy} alt="trophy" style={{ position: 'absolute', top: 0, width: '200px', height: '150px', zIndex: '0' }} />
                 <Typography variant="h6" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>Rank</Typography>
                 <Typography variant="h1" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>{petCount.rank}</Typography>
                 </div>
@@ -391,6 +393,55 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               </div>
             </Box>
             </Grid>
+            </Box> :
+            <Box sx={{display: 'flex', alignItems: 'center', width: '100%'}}>
+            {!isGroup && (
+              <>
+              <Grid size={{xs: 7}} sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
+                {/* <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} /> */}
+                <img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                <Typography variant="h3" sx={{textAlign: 'center', ml: 5}}>{petCount.player}</Typography>
+              </Grid>
+              </>
+            )}
+
+            {isGroup && (
+            <Grid size={{xs: 7}} sx={{display: 'flex', justifyContent: 'center', ml: 5}}>
+              <Box sx={{display: 'flex', flexDirection: 'row'}}>
+              <Box sx={{display: 'flex', justifyContent: 'center', position: 'relative', flexGrow: 0}}>
+                <div style={{ height: "170px", width: "200px" }}>
+                <img src={getTrophyImage(petCount.rank) || otherTrophy} alt="trophy" style={{ position: 'absolute', top: 0, width: '200px', height: '150px', zIndex: '0' }} />
+                <Typography variant="h6" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>Rank</Typography>
+                <Typography variant="h1" sx={{textAlign: 'center', position: 'relative', zIndex: '1'}}>{petCount.rank}</Typography>
+                </div>
+              </Box>
+              <Typography variant="h3" sx={{textAlign: 'center', ml: 5, mt: 4}}>{petCount.player}</Typography>
+              
+              </Box>
+            </Grid>
+            )}
+
+            <Grid size={{xs: 4 }} sx={{display: 'flex', justifyContent: 'end'}}>
+            <Box sx={{display: 'flex', flexGrow: '0'}}>
+              <div style={{ height: "160px", width: "120px" }}>
+                <CircularProgressbar 
+                value={manualMode ? manualPets.pet_count / totalPets : petCount.pet_count / totalPets} 
+                maxValue={1} 
+                text={`${manualMode ? manualPets.pet_count : petCount.pet_count} / ${totalPets}`} 
+                styles={buildStyles({
+                strokeLinecap: 'round',
+                pathTransitionDuration: 3,
+
+                // Colors
+                pathColor: petCountColor,
+                textColor: petCountColor,
+                trailColor: '#181818',
+                })}/>
+                <Typography variant="h6" sx={{textAlign: 'center', mt: 1}}>Pet Count</Typography>
+              </div>
+            </Box>
+            </Grid>
+            </Box> }
               {manualMode && missingMode && combinedMissing ? (
                 renderMissingPets(manualPets.pets)
               ) : manualMode && combinedMissing ? (
