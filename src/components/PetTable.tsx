@@ -40,9 +40,10 @@ interface PetTableProps {
   petHoursColor: string;
   avatarImage: string | null;
   isCompact?: boolean;
+  hideAvatar?: boolean;
 }
 
-export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, avatarImage, isCompact }: PetTableProps) {
+export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, avatarImage, isCompact, hideAvatar }: PetTableProps) {
   const [manualPets, setManualPets] = useState<PetCountResponse>({
     pet_count: 0,
     pet_hours: 0,
@@ -350,7 +351,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               <>
               <Grid size={{xs: 4}} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
                 {/* <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} /> */}
-                <img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                {!hideAvatar && (<img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />)}
                 <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>
               </Grid>
               </>
@@ -399,7 +400,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               <>
               <Grid size={{xs: 7}} sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
                 {/* <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} /> */}
-                <img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                {!hideAvatar && (<img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />)}
                 <Typography variant="h3" sx={{textAlign: 'center', ml: 5}}>{petCount.player}</Typography>
               </Grid>
               </>

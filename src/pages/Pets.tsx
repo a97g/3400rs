@@ -45,6 +45,7 @@ export default function Pets() {
   const [imageSettingsOpen, setImageSettingsOpen] = useState(false);
   const [colorSettingsOpen, setColorSettingsOpen] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
+  const [hideAvatar, setHideAvatar] = useState(false);
 
   const emptyPets: PetCountResponse = { pets: {}, pet_hours: 0, pet_count: 0, player: ' ', rank: 0, };
   const emptyLog: LogCountResponse = {
@@ -388,10 +389,15 @@ export default function Pets() {
                       </Button>
                       </>
                       )}
-                      <Button variant="contained" onClick={() => { setIsCompact(!isCompact); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                      <Button variant="contained" onClick={() => { setIsCompact(!isCompact); }} className='setting-button settings-toggle' sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
                       <BadgeOutlined />
                       Alternate Name Format
                       <Checkbox checked={isCompact} onChange={() => { setIsCompact(!isCompact); }} color="default"/>
+                      </Button>
+                      <Button variant="contained" onClick={() => { setHideAvatar(!hideAvatar); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                      <MoodBadOutlined />
+                      Hide Avatar
+                      <Checkbox checked={hideAvatar} onChange={() => { setHideAvatar(!hideAvatar); }} color="default"/>
                       </Button>
                       {!isGroup && (
                       <Button variant="contained" component="label" className='setting-button' sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 2, pb: 2,  mt: 3}}>
@@ -581,6 +587,7 @@ export default function Pets() {
                 petHoursColor={petHoursColor}
                 avatarImage={avatarImage}
                 isCompact={isCompact}
+                hideAvatar={hideAvatar}
               />
             </Box>
           )}
