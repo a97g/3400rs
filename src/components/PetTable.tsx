@@ -7,6 +7,7 @@ import * as DetailedPet from '../resources/pets/detailed';
 import goldTrophy from '../resources/pets/assets/goldped.png';
 import silverTrophy from '../resources/pets/assets/silverped.png';
 import bronzeTrophy from '../resources/pets/assets/bronzeped.png';
+import DefaultIcon from '../resources/pets/assets/chat.png';
 
 interface PetData {
   [key: string]: number;
@@ -230,7 +231,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   };
 
   const petOrder = [
-    "Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte",
+    "Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Yami",
     "Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel",
     "Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling",
     "Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme",
@@ -310,6 +311,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     { petName: "Huberte", hours: 47 },
     { petName: "Moxi", hours: 36 },
     { petName: "Bran", hours: 100 },
+    { petName: "Yami", hours: 10 },
   ];
 
   return (
@@ -343,7 +345,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
             {!isGroup && (
               <>
               <Grid size={{xs: 4}} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
-                <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                {/* <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} /> */}
+                <img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />
                 <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>
               </Grid>
               </>
@@ -392,7 +395,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                 renderMissingPets(manualPets.pets)
               ) : manualMode && combinedMissing ? (
                 <>
-                  {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], manualPets.pets)}
+                  {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Yami"], manualPets.pets)}
                   {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], manualPets.pets)}
                   {renderObtainedPets("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], manualPets.pets)}
                   {renderObtainedPets("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], manualPets.pets)}
@@ -407,7 +410,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                 </>
               ) : manualMode ? (
                 <>
-                  {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], manualPets.pets)}
+                  {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Yami"], manualPets.pets)}
                   {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], manualPets.pets)}
                   {renderPetGrid("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], manualPets.pets)}
                   {renderPetGrid("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], manualPets.pets)}
@@ -425,7 +428,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                 renderMissingPets(petCount.pets)
               ) : combinedMissing && !manualMode ? (
                 <>
-                  {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], petCount.pets)}
+                  {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Yami"], petCount.pets)}
                   {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], petCount.pets)}
                   {renderObtainedPets("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], petCount.pets)}
                   {renderObtainedPets("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], petCount.pets)}
@@ -440,7 +443,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                 </>
               ) : (
                 <>
-                  {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte"], petCount.pets)}
+                  {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Yami"], petCount.pets)}
                   {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], petCount.pets)}
                   {renderPetGrid("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], petCount.pets)}
                   {renderPetGrid("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], petCount.pets)}

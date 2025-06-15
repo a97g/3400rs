@@ -17,7 +17,7 @@ import AsciiGenerator from '../components/AsciiGenerator';
 import { toPng } from 'html-to-image';
 
 export default function Pets() {
-  const totalPets = 63;
+  const totalPets = 64;
   const totalHours = 5370;
 
   const [group, setGroup] = useState('2394');

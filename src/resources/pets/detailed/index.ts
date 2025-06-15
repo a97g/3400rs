@@ -68,3 +68,4 @@ export { default as Kephri } from './Kephri.png';
 export { default as Zebak } from './Zebak.png';
 export { default as Warden } from './Warden.png';
 export { default as Bran } from './Bran.png';
+export { default as Yami } from './Yami.png';
