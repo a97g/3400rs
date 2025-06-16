@@ -38,12 +38,22 @@ interface PetTableProps {
   ref: RefObject<HTMLDivElement>;
   petCountColor: string;
   petHoursColor: string;
-  avatarImage: string | null;
-  isCompact?: boolean;
+  petBgColor1: string;
+  petBgColor2: string;
+  onSetPetCountColor: (color: string) => void;
+  onSetPetHoursColor: (color: string) => void;
+  onSetPetBgColor1: (color: string) => void;
+  onSetPetBgColor2: (color: string) => void;
+  onSetPlayer: (name: string) => void;
+  onSetHideAvatar: (hide: boolean) => void;
+  onSetIsCompact: (compact: boolean) => void;
+  player: string;
+  avatarImage?: string | null;
   hideAvatar?: boolean;
+  isCompact?: boolean;
 }
 
-export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, avatarImage, isCompact, hideAvatar }: PetTableProps) {
+export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, petBgColor1, petBgColor2, avatarImage, isCompact, hideAvatar, player, onSetPetCountColor, onSetPetHoursColor, onSetPetBgColor1, onSetPetBgColor2, onSetPlayer, onSetHideAvatar, onSetIsCompact }: PetTableProps) {
   const [manualPets, setManualPets] = useState<PetCountResponse>({
     pet_count: 0,
     pet_hours: 0,
@@ -121,7 +131,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
 
   // const handleConfirm = () => {
   //   setConfirmed(true);
-  // };
+  // }
 
   const handleKcChange = (petName: string, value: string) => {
     setKcValues(prevState => ({
@@ -133,25 +143,31 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const handleExportPetData = () => {
     let exportSource: { [key: string]: PetCountResponse };
     if (manualMode) {
-      // Use manualPets as the only entry
       exportSource = { 'manual': manualPets };
     } else {
       exportSource = passedPets;
     }
-    const exportedData = Object.keys(exportSource).reduce((acc, key) => {
-      const petCount = exportSource[key];
-      const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
-      const petData = obtainedPets.reduce((petAcc, petName) => {
-        petAcc[petName] = kcValues[petName] || 0;
-        return petAcc;
-      }, {} as { [key: string]: string | number });
-      acc[key] = petData;
-      return acc;
-    }, {} as { [key: string]: { [key: string]: string | number } });
-
+    const exportedData = {
+      pets: Object.keys(exportSource).reduce((acc, key) => {
+        const petCount = exportSource[key];
+        const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
+        const petData = obtainedPets.reduce((petAcc, petName) => {
+          petAcc[petName] = kcValues[petName] || 0;
+          return petAcc;
+        }, {} as { [key: string]: string | number });
+        acc[key] = petData;
+        return acc;
+      }, {} as { [key: string]: { [key: string]: string | number } }),
+      petCountColor,
+      petHoursColor,
+      petBgColor1,
+      petBgColor2,
+      player,
+      hideAvatar,
+      isCompact
+    };
     const exportedString = JSON.stringify(exportedData, null, 2);
     setExportedKcData(exportedString);
-
     navigator.clipboard.writeText(exportedString)
       .then(() => {
         alert('Pet data copied to clipboard!');
@@ -165,16 +181,16 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     navigator.clipboard.readText()
       .then(text => {
         const importedData = JSON.parse(text);
-        const newKcValues = Object.keys(importedData).reduce((acc, key) => {
-          const petData = importedData[key];
+        // Handle pets
+        const petsData = importedData.pets || importedData; // fallback for old format
+        const newKcValues = Object.keys(petsData).reduce((acc, key) => {
+          const petData = petsData[key];
           Object.keys(petData).forEach(petName => {
             acc[petName] = petData[petName].toString();
           });
           return acc;
         }, {} as { [key: string]: string });
         setKcValues(newKcValues);
-
-        // If in manual mode, update manualPets to reflect obtained pets
         if (manualMode) {
           const updatedPets: PetData = { ...manualPets.pets };
           Object.keys(newKcValues).forEach(petName => {
@@ -188,6 +204,38 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
             pet_count: newPetCount
           }));
         }
+        // Handle colors and settings
+        if (importedData.petCountColor) onSetPetCountColor(importedData.petCountColor);
+        if (importedData.petHoursColor) onSetPetHoursColor(importedData.petHoursColor);
+        if (importedData.petBgColor1) onSetPetBgColor1(importedData.petBgColor1);
+        if (importedData.petBgColor2) onSetPetBgColor2(importedData.petBgColor2);
+        if (importedData.player) {
+          onSetPlayer(importedData.player);
+          if (manualMode) {
+            setManualPets(prev => ({
+              ...prev,
+              player: importedData.player
+            }));
+          } else {
+            // For non-manual mode, update the first petCounts entry
+            setPassedPets(prev => {
+              const keys = Object.keys(prev);
+              if (keys.length > 0) {
+                const firstKey = keys[0];
+                return {
+                  ...prev,
+                  [firstKey]: {
+                    ...prev[firstKey],
+                    player: importedData.player
+                  }
+                };
+              }
+              return prev;
+            });
+          }
+        }
+        if (typeof importedData.hideAvatar === 'boolean') onSetHideAvatar(importedData.hideAvatar);
+        if (typeof importedData.isCompact === 'boolean') onSetIsCompact(importedData.isCompact);
         alert('Pet data imported successfully!');
       })
       .catch(err => {
@@ -378,7 +426,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               <Grid size={{xs: 4}} sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
                 {/* <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} /> */}
                 {!hideAvatar && (<img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />)}
-                <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{petCount.player}</Typography>
+                <Typography variant="h3" sx={{textAlign: 'center', mb: 5}}>{player}</Typography>
               </Grid>
               </>
             )}
@@ -427,7 +475,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               <Grid size={{xs: 7}} sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', position: 'relative'}}>
                 {/* <img src={avatarImage || `https://services.runescape.com/m=avatar-rs/${petCount.player}/chat.png`} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} /> */}
                 {!hideAvatar && (<img src={avatarImage || DefaultIcon} alt="avatar" className='charIcon' style={{ maxWidth: '100px', maxHeight: '100px' }} />)}
-                <Typography variant="h3" sx={{textAlign: 'center', ml: 5}}>{petCount.player}</Typography>
+                <Typography variant="h3" sx={{textAlign: 'center', ml: 5}}>{player}</Typography>
               </Grid>
               </>
             )}
@@ -542,8 +590,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
             <>
             <Typography variant='h4' sx={{fontWeight: 500, textAlign: 'center'}}>KC Mode</Typography>
             <Box sx={{display: 'flex', mb: 2, justifyContent: 'space-evenly'}}>
-              <Button variant="contained" className='setting-button settings-toggle' onClick={handleImportPetData}>Import KC Data</Button>
-              <Button variant="contained" className='setting-button settings-toggle' onClick={handleExportPetData}>Export KC Data</Button>
+              <Button variant="contained" className='setting-button settings-toggle' onClick={handleImportPetData}>Import Data</Button>
+              <Button variant="contained" className='setting-button settings-toggle' onClick={handleExportPetData}>Export Data</Button>
             </Box>
             {exportedKcData && (
                 <Box sx={{mb: 2, mx: 'auto', maxWidth: 700}}>

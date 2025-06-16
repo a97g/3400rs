@@ -593,9 +593,19 @@ export default function Pets() {
                 ref={ref}
                 petCountColor={petCountColor}
                 petHoursColor={petHoursColor}
+                petBgColor1={petBgColor1}
+                petBgColor2={petBgColor2}
                 avatarImage={avatarImage}
                 isCompact={isCompact}
                 hideAvatar={hideAvatar}
+                player={player}
+                onSetPetCountColor={setPetCountColor}
+                onSetPetHoursColor={setPetHoursColor}
+                onSetPetBgColor1={setPetBgColor1}
+                onSetPetBgColor2={setPetBgColor2}
+                onSetPlayer={setPlayer}
+                onSetHideAvatar={setHideAvatar}
+                onSetIsCompact={setIsCompact}
               />
             </Box>
           )}
