@@ -124,7 +124,15 @@ export default function Pets() {
       
       const response = await axios.get(proxyUrl + encodeURIComponent(url + '?' + params.toString()));
       if (response && response.data) {
-        setPetCounts(response.data.data);
+        console.log(response.data);
+        if (response.data.error) {
+          setRsnError(true);
+          setTimeout(() => {
+            setRsnError(false);
+          }, 5000);
+        } else {
+          setPetCounts(response.data.data);
+        }
       } else {
         setRsnError(true);
         setTimeout(() => {

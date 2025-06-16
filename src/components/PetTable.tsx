@@ -54,6 +54,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   // const [confirmed, setConfirmed] = useState(false);
   const [kcValues, setKcValues] = useState<{ [key: string]: string }>({});
   const [passedPets, setPassedPets] = useState(petCounts);
+  const [exportedKcData, setExportedKcData] = useState<string | null>(null);
 
   useEffect(() => {
     setPassedPets(petCounts);
@@ -130,8 +131,15 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   };
 
   const handleExportPetData = () => {
-    const exportedData = Object.keys(passedPets).reduce((acc, key) => {
-      const petCount = passedPets[key];
+    let exportSource: { [key: string]: PetCountResponse };
+    if (manualMode) {
+      // Use manualPets as the only entry
+      exportSource = { 'manual': manualPets };
+    } else {
+      exportSource = passedPets;
+    }
+    const exportedData = Object.keys(exportSource).reduce((acc, key) => {
+      const petCount = exportSource[key];
       const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
       const petData = obtainedPets.reduce((petAcc, petName) => {
         petAcc[petName] = kcValues[petName] || 0;
@@ -140,8 +148,11 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
       acc[key] = petData;
       return acc;
     }, {} as { [key: string]: { [key: string]: string | number } });
-  
-    navigator.clipboard.writeText(JSON.stringify(exportedData))
+
+    const exportedString = JSON.stringify(exportedData, null, 2);
+    setExportedKcData(exportedString);
+
+    navigator.clipboard.writeText(exportedString)
       .then(() => {
         alert('Pet data copied to clipboard!');
       })
@@ -162,6 +173,21 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
           return acc;
         }, {} as { [key: string]: string });
         setKcValues(newKcValues);
+
+        // If in manual mode, update manualPets to reflect obtained pets
+        if (manualMode) {
+          const updatedPets: PetData = { ...manualPets.pets };
+          Object.keys(newKcValues).forEach(petName => {
+            const val = newKcValues[petName];
+            updatedPets[petName] = val !== "0" && val !== null && val !== undefined && val !== '' ? 1 : 0;
+          });
+          const newPetCount = Object.values(updatedPets).filter(v => v === 1).length;
+          setManualPets(prev => ({
+            ...prev,
+            pets: updatedPets,
+            pet_count: newPetCount
+          }));
+        }
         alert('Pet data imported successfully!');
       })
       .catch(err => {
@@ -519,7 +545,14 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
               <Button variant="contained" className='setting-button settings-toggle' onClick={handleImportPetData}>Import KC Data</Button>
               <Button variant="contained" className='setting-button settings-toggle' onClick={handleExportPetData}>Export KC Data</Button>
             </Box>
-            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+            {exportedKcData && (
+                <Box sx={{mb: 2, mx: 'auto', maxWidth: 700}}>
+                  <Typography variant="body2" sx={{whiteSpace: 'pre-wrap', color: 'white', background: '#222', p: 2, borderRadius: 2}}>
+                    {exportedKcData}
+                  </Typography>
+                </Box>
+              )}
+              <Box sx={{display: 'flex', justifyContent: 'center'}}>
               <TableContainer component={Paper} className="pet-container" sx={{ mt: 3, backgroundColor: '#0f0f0f' }}>
                 <Table>
                   <TableHead>
