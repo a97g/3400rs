@@ -287,6 +287,10 @@ export default function Pets() {
       }
   };
 
+  useEffect(() => {
+    document.documentElement.style.setProperty('--obtained-pet-bg', `linear-gradient(135deg, ${petBgColor1}, ${petBgColor2})`);
+  }, [petBgColor1, petBgColor2]);
+
   return (
     <Page title="3400 Pet List Tools">
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
