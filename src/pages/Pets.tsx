@@ -1,6 +1,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Box, Button, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField, Alert, Zoom } from '@mui/material';
+import { Box, Button, Divider, IconButton, InputBase, Paper, Tooltip, Typography, Checkbox, ToggleButton, ToggleButtonGroup, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField as MuiTextField, Alert, Zoom, Snackbar } from '@mui/material';
 import Page from '../components/Page';
 import nav3400rs from "../resources/nav/nav3400rs.png";
 import axios from 'axios';
@@ -15,6 +15,7 @@ import PetTable from '../components/PetTable';
 import PetLeaderboard from '../components/PetLeaderboard';
 import AsciiGenerator from '../components/AsciiGenerator';
 import { toPng } from 'html-to-image';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function Pets() {
   const totalPets = 64;
@@ -23,6 +24,7 @@ export default function Pets() {
   const [group, setGroup] = useState('2394');
   const [player, setPlayer] = useState('3400');
   const [rsnError, setRsnError] = useState(false);
+  const [openError, setOpenError] = useState(false);
   const [missingMode, setMissingMode] = useState(false);
   const [isGroup, setIsGroup] = useState(false);
   const [isLeaderboard, setIsLeaderboard] = useState(false);
@@ -106,7 +108,7 @@ export default function Pets() {
       if (!isGroup) {
         // Only fetch from the new endpoint for individual mode
         const response = await axios.get(proxyUrl + encodeURIComponent(url));
-        if (response && response.data) {
+        if (response && response.data.data) {
           // Map the response to your PetCountResponse structure
           const data = response.data.data;
           const allPets = data.items?.all_pets || [];
@@ -338,6 +340,10 @@ export default function Pets() {
   useEffect(() => {
     document.documentElement.style.setProperty('--obtained-pet-bg', `linear-gradient(135deg, ${petBgColor1}, ${petBgColor2})`);
   }, [petBgColor1, petBgColor2]);
+
+  useEffect(() => {
+    if (rsnError) setOpenError(true);
+  }, [rsnError]);
 
   return (
     <Page title="3400 Pet List Tools">
@@ -595,7 +601,33 @@ export default function Pets() {
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', maxWidth: '300px', mr: 1 }}>
-              {rsnError && (<Alert severity="error">No pet data found.</Alert>)}
+              <Snackbar
+                open={openError}
+                autoHideDuration={8000}
+                onClose={() => setOpenError(false)}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                TransitionComponent={Zoom}
+              >
+                <Alert
+                  severity="error"
+                  variant="filled"
+                  sx={{ borderRadius: 3, boxShadow: 3, minWidth: 400, alignItems: 'center', fontSize: '1.1em', background: '#2d232b', color: '#fff' }}
+                  action={
+                    <IconButton
+                      aria-label="close"
+                      color="inherit"
+                      size="small"
+                      onClick={() => setOpenError(false)}
+                      sx={{ mt: '-4px' }}
+                    >
+                      <CloseIcon fontSize="inherit" />
+                    </IconButton>
+                  }
+                >
+                  To have your pet data uploaded to Temple, it requires the RuneLite plugin <b>TempleOSRS</b> to be installed and the <b>Automatically sync Collection Log</b> option to be selected.<br/>
+                  For more information please refer to <a href="https://www.templeosrs.com/faq.php#FAQ_22" target="_blank" rel="noopener noreferrer" style={{color:'#ffb300'}}>this FAQ (Collection Log Section)</a>.
+                </Alert>
+              </Snackbar>
               <Typography>{isGroup ? 'Temple Group Id' : 'Runescape Name'}</Typography>
               <Paper
                 component="form"
