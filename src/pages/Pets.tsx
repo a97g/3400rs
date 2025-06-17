@@ -8,7 +8,6 @@ import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissat
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 import Temple from '../resources/pets/assets/temple.svg';
-import Clog from '../resources/pets/assets/clog.webp';
 import Hiscores from '../resources/pets/assets/hiscores.png';
 import './Pets.css';
 import PetTable from '../components/PetTable';
