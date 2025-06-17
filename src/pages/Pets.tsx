@@ -332,9 +332,7 @@ export default function Pets() {
       window.location.href='https://templeosrs.com/'
     } else if(site === 'Hiscores' ) {
       window.location.href='https://secure.runescape.com/m=hiscore_oldschool/overall'
-    } else if (site === 'Clog') {
-      window.location.href='https://collectionlog.net/recent-items'
-      }
+    }
   };
 
   useEffect(() => {
@@ -552,9 +550,6 @@ export default function Pets() {
               <Button variant="outlined" sx={{border: 0}} onClick={() => handleSiteClick('Hiscores')}>
                 <img src={Hiscores} alt="temple" className="temple"/>
               </Button>
-              <Button variant="outlined" sx={{border: 0}} onClick={() => handleSiteClick('Clog')}>
-                <img src={Clog} alt="temple" className="temple"/>
-              </Button>
             </Box>
           </Box> 
         </Box>
@@ -624,6 +619,7 @@ export default function Pets() {
                     </IconButton>
                   }
                 >
+                <h3 style={{ margin: 0, fontSize: '1.2em' }}>Error, No data found for this RSN.</h3>
                   To have your pet data uploaded to Temple, it requires the RuneLite plugin <b>TempleOSRS</b> to be installed and the <b>Automatically sync Collection Log</b> option to be selected.<br/>
                   For more information please refer to <a href="https://www.templeosrs.com/faq.php#FAQ_22" target="_blank" rel="noopener noreferrer" style={{color:'#ffb300'}}>this FAQ (Collection Log Section)</a>.
                 </Alert>
