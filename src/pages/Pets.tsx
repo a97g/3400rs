@@ -63,7 +63,7 @@ export default function Pets() {
   }
   const [petCounts, setPetCounts] = useState<{ [key: string]: PetCountResponse }>({ '': emptyPets });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [logCount, setLogCount] = useState<{ [key: string]: any }>({ '': emptyLog });
+  const [logCount] = useState<{ [key: string]: any }>({ '': emptyLog });
 
   const [transmogs, setTransmogs] = useState<{ [key: string]: number }>({
     'Metamorphic Dust': 0,
