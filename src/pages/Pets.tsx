@@ -100,44 +100,92 @@ export default function Pets() {
 
   const getPetCount = async () => {
     const proxyUrl = 'https://corsproxy.io/?';
-    const url = 'https://templeosrs.com/api/pets/pet_count.php';
-    const urlLog = 'https://templeosrs.com/api/collection-log/player_collections.php';
-  
-    const params = new URLSearchParams(
-      isGroup
-        ? { group: group, count: '200' }
-        : { player: player, count: '200' }
-    );
-  
+    const url = `https://templeosrs.com/api/collection-log/player_collection_log.php?player=${player}&categories=all_pets,chambers_of_xeric,theatre_of_blood,tombs_of_amascut`;
+
     try {
       if (!isGroup) {
-        const responseLog = await axios.get(proxyUrl + encodeURIComponent(urlLog + '?' + params.toString()));
-        if (responseLog && responseLog.data) {
-          setLogCount(responseLog.data.data);
+        // Only fetch from the new endpoint for individual mode
+        const response = await axios.get(proxyUrl + encodeURIComponent(url));
+        if (response && response.data) {
+          // Map the response to your PetCountResponse structure
+          const data = response.data.data;
+          const allPets = data.items?.all_pets || [];
+          const chambers = data.items?.chambers_of_xeric || [];
+          const tob = data.items?.theatre_of_blood || [];
+          const toa = data.items?.tombs_of_amascut || [];
+
+          // Correct petIdOrder to match the provided order
+          const petIdOrder = [
+            13262,22746,13178,13247,11995,12651,12816,12644,12643,12645,13225,12650,12646,21748,21291,12647,12653,12655,12649,12652,13181,21273,12648,13177,13179,21992,20693,12921,20851,22473,19730,12703,13320,13321,13322,13324,20659,20661,20663,20665,21509,13071,23495,23760,23757,24491,25348,25602,26348,26901,27352,27590,28246,28250,28248,28252,28801,28960,28962,29836,30152,30154,30622,30888
+          ];
+          const petOrder = [
+            "Abyssal orphan","Ikkle hydra","Callisto cub","Hellpuppy","Pet chaos elemental","Pet zilyana","Pet dark core","Pet dagannoth prime","Pet dagannoth supreme","Pet dagannoth rex","Tzrek-jad","Pet general graardor","Baby mole","Noon","Jal-nib-rek","Kalphite princess","Prince black dragon","Pet kraken","Pet kree'arra","Pet k'ril tsutsaroth","Scorpia's offspring","Skotos","Pet smoke devil","Venenatis spiderling","Vet'ion jr. ","Vorki","Phoenix","Pet snakeling","Olmlet","Lil' zik","Bloodhound","Pet penance queen","Heron","Rock golem","Beaver","Baby chinchompa","Giant squirrel","Tangleroot","Rocky","Rift guardian","Herbi","Chompy chick","Sraracha","Smolcano","Youngllef","Little nightmare","Lil' creator","Tiny tempor","Nexling","Abyssal protector","Tumeken's guardian","Muphin","Wisp","Baron","Butch","Lil'viathan","Scurry","Smol Heredit","Quetzin","Nid","Huberte","Moxi","Bran","Yami"
+          ];
+          const idToPetName: { [id: number]: string } = {};
+          petIdOrder.forEach((id, idx) => {
+            idToPetName[id] = petOrder[idx];
+          });
+
+          // Initialize all pets to 0 (not obtained)
+          const pets: { [key: string]: number } = {};
+          petOrder.forEach(name => { pets[name] = 0; });
+
+          // Set obtained pets from API response
+          allPets.forEach((pet: any) => {
+            const petName = idToPetName[pet.id];
+            if (petName) pets[petName] = pet.count >= 1 ? 1 : 0;
+          });
+
+          const petCount = Object.values(pets).filter(v => v > 0).length;
+
+          // Parse transmogs
+          let metaDust = 0, sanguineDust = 0, Akkha = 0, Baba = 0, Kephri = 0, Zebak = 0, Warden = 0;
+          // Metamorphic Dust (22386) from chambers_of_xeric
+          chambers.forEach((item: any) => { if (item.id === 22386 && item.count >= 1) metaDust = 1; });
+          // Sanguine Dust (25746) from theatre_of_blood
+          tob.forEach((item: any) => { if (item.id === 25746 && item.count >= 1) sanguineDust = 1; });
+          // ToA transmogs from tombs_of_amascut
+          toa.forEach((item: any) => {
+            if (item.id === 27377 && item.count >= 1) Akkha = 1;
+            if (item.id === 27378 && item.count >= 1) Baba = 1;
+            if (item.id === 27379 && item.count >= 1) Kephri = 1;
+            if (item.id === 27380 && item.count >= 1) Zebak = 1;
+            if (item.id === 27381 && item.count >= 1) Warden = 1;
+          });
+          setTransmogs({
+            'Metamorphic Dust': metaDust,
+            'Sanguine Dust': sanguineDust,
+            Akkha,
+            Baba,
+            Kephri,
+            Zebak,
+            Warden
+          });
+
+          setPetCounts({
+            '1': {
+              pets,
+              pet_count: petCount,
+              pet_hours: 0, // fetched elsewhere
+              player: data.player_name_with_capitalization || data.player || player,
+              rank: 0
+            }
+          });
         } else {
           setRsnError(true);
-          setTimeout(() => {
-            setRsnError(false);
-          }, 5000);
-        }
-      }
-      
-      const response = await axios.get(proxyUrl + encodeURIComponent(url + '?' + params.toString()));
-      if (response && response.data) {
-        console.log(response.data);
-        if (response.data.error) {
-          setRsnError(true);
-          setTimeout(() => {
-            setRsnError(false);
-          }, 5000);
-        } else {
-          setPetCounts(response.data.data);
+          setTimeout(() => setRsnError(false), 5000);
         }
       } else {
-        setRsnError(true);
-        setTimeout(() => {
-          setRsnError(false);
-        }, 5000);
+        // Keep group logic
+        const url = 'https://templeosrs.com/api/pets/pet_count.php';
+        const params = new URLSearchParams({ group: group, count: '200' });
+        const response = await axios.get(proxyUrl + encodeURIComponent(url + '?' + params.toString()));
+        if (response && response.data) {
+          setPetCounts(response.data.data);
+        } else {
+          setRsnError(true);
+          setTimeout(() => setRsnError(false), 5000);
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -515,7 +563,9 @@ export default function Pets() {
                   <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
                   Enter your RuneScape username and click the magnifying glass.
                   <br />
-                  This will query the Temple&apos;s API to retrieve and display your pets in the chart below.
+                  By querying the Temple&apos;s API the table will display your pets below.
+                  <br />
+                  If your data is not found, use the TempleOSRS Plugin to update your data.
                   <br />
                   Use the sidebar options to customize the chart&apos;s visual appearance.
                   </Typography>

@@ -9,6 +9,7 @@ import silverTrophy from '../resources/pets/assets/silverped.png';
 import bronzeTrophy from '../resources/pets/assets/bronzeped.png';
 import otherTrophy from '../resources/pets/assets/otherped.png';
 import DefaultIcon from '../resources/pets/assets/chat.png';
+import axios from 'axios';
 
 interface PetData {
   [key: string]: number;
@@ -65,6 +66,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const [kcValues, setKcValues] = useState<{ [key: string]: string }>({});
   const [passedPets, setPassedPets] = useState(petCounts);
   const [exportedKcData, setExportedKcData] = useState<string | null>(null);
+  const [petHoursMap, setPetHoursMap] = useState<{ [petName: string]: number }>({});
 
   useEffect(() => {
     setPassedPets(petCounts);
@@ -99,6 +101,29 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
       }));
     }
   }, [manualMode]);
+
+  useEffect(() => {
+    const hoursUrl = 'https://templeosrs.com/api/pets/hours.php';
+    const proxyUrl = 'https://corsproxy.io/?';
+    async function fetchPetHours() {
+      try {
+        const response = await axios.get(proxyUrl + encodeURIComponent(hoursUrl));
+        if (response && response.data) {
+          // The response is an object with pet names as keys
+          const hoursMap: { [petName: string]: number } = {};
+          Object.values(response.data).forEach((entry: any) => {
+            if (entry.pet_name && typeof entry.pet_hours === 'number') {
+              hoursMap[entry.pet_name] = entry.pet_hours;
+            }
+          });
+          setPetHoursMap(hoursMap);
+        }
+      } catch (error) {
+        // fallback: do nothing, keep previous value
+      }
+    }
+    fetchPetHours();
+  }, []);
 
   const getPetIconClass = (petName: string, pets: PetData) => {
     if (manualMode) {
@@ -391,6 +416,18 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     { petName: "Yami", hours: 10 },
   ];
 
+  const getTotalPetHours = () => {
+    if (manualMode) {
+      return manualPets.pet_hours;
+    }
+    if (petCounts && petCounts['1'] && petCounts['1'].pets && Object.keys(petHoursMap).length > 0) {
+      return Object.entries(petCounts['1'].pets)
+        .filter(([petName, obtained]) => obtained === 1 && petHoursMap[petName] !== undefined)
+        .reduce((sum, [petName]) => sum + petHoursMap[petName], 0);
+    }
+    return 0;
+  };
+
   return (
     <Box sx={{ p: '24px'}}>
     {Object.keys(passedPets).length > 0 && (
@@ -451,9 +488,9 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
             <Box sx={{display: 'flex', flexGrow: '0'}}>
               <div style={{ height: "160px", width: "120px" }}>
                 <CircularProgressbar 
-                value={manualMode ? manualPets.pet_hours / totalHours : petCount.pet_hours / totalHours} 
+                value={getTotalPetHours() / totalHours} 
                 maxValue={1} 
-                text={`${manualMode ? manualPets.pet_hours : petCount.pet_hours}h`}
+                text={`${getTotalPetHours()}h`}
                 styles={buildStyles({
                   strokeLinecap: 'round',
                   pathTransitionDuration: 3,
