@@ -7,8 +7,8 @@ import axios from 'axios';
 import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, BadgeOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
-import Temple from '../resources/pets/assets/temple.svg';
-import Hiscores from '../resources/pets/assets/hiscores.png';
+// import Temple from '../resources/pets/assets/temple.svg';
+// import Hiscores from '../resources/pets/assets/hiscores.png';
 import './Pets.css';
 import PetTable from '../components/PetTable';
 import PetLeaderboard from '../components/PetLeaderboard';
@@ -331,13 +331,13 @@ export default function Pets() {
     }
   };
 
-  const handleSiteClick = (site: string) => {
-    if (site === 'Temple') {
-      window.location.href='https://templeosrs.com/'
-    } else if(site === 'Hiscores' ) {
-      window.location.href='https://secure.runescape.com/m=hiscore_oldschool/overall'
-    }
-  };
+  // const handleSiteClick = (site: string) => {
+  //   if (site === 'Temple') {
+  //     window.location.href='https://templeosrs.com/'
+  //   } else if(site === 'Hiscores' ) {
+  //     window.location.href='https://secure.runescape.com/m=hiscore_oldschool/overall'
+  //   }
+  // };
 
   useEffect(() => {
     document.documentElement.style.setProperty('--obtained-pet-bg', `linear-gradient(135deg, ${petBgColor1}, ${petBgColor2})`);
