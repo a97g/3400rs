@@ -76,7 +76,7 @@
     border-radius: 8px; /* Slightly rounded edges */
     border: 1px solid #53575f; /* 1px border with #53575f color */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Slight drop shadow */
-    padding: 2em; /* Optional: Add some padding inside the container */
+    padding: 2em; 
     gap: 1em 2em;
     margin-bottom: 1em;
     max-width: 1074px;
@@ -170,4 +170,25 @@ charIcon {
 
 .temple {
     width: 20px;
+}
+
+/* Media query to hide the goldavi image inside .banner-box on mobile devices */
+@media (max-width: 900px) {
+  .banner-box img.goldavi {
+    display: none !important;
+  }
+
+  /* Styling for the pet container */
+.pet-container {
+    display: flex;
+    justify-content: space-around;
+    background-color: #0f0f0f; /* Dark background color */
+    border-radius: 8px; /* Slightly rounded edges */
+    border: 1px solid #53575f; /* 1px border with #53575f color */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Slight drop shadow */
+    padding: 0; 
+    gap: 1em 2em;
+    margin-bottom: 1em;
+    max-width: 1074px;
+}
 }

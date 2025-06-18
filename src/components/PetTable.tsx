@@ -1,5 +1,5 @@
 import React, { useState, useEffect, RefObject } from 'react';
-import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, useMediaQuery, useTheme } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import * as InvyPet from '../resources/pets/inv';
@@ -67,6 +67,9 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const [passedPets, setPassedPets] = useState(petCounts);
   const [exportedKcData, setExportedKcData] = useState<string | null>(null);
   const [petHoursMap, setPetHoursMap] = useState<{ [petName: string]: number }>({});
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
 
   useEffect(() => {
     setPassedPets(petCounts);
@@ -429,7 +432,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   };
 
   return (
-    <Box sx={{ p: '24px'}}>
+    <Box sx={{ p: isMobile ? 0 : '24px', pt: isMobile ? '24px' : 0}}>
     {Object.keys(passedPets).length > 0 && (
       Object.entries(passedPets).map(([key, petCount]) => (
         <div key={key}>
