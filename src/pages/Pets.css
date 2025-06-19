@@ -192,3 +192,14 @@ charIcon {
     max-width: 1074px;
 }
 }
+
+.kc-mode-text {
+  max-width: 60px;
+  text-align: center;
+  color: white;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  font-size: 0.95em;
+  margin-top: 4px;
+}

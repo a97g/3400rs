@@ -286,7 +286,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
           <img src={petImage} alt={petName} className={detailedMode ? 'detailed-pet-image' : undefined} />
         </Box>
         {kcMode && petIconClass === 'obtained-pet-icon' && (
-          <Typography variant="body2" sx={{ mt: 1, color: 'white' }}>
+          <Typography variant="body2" className="kc-mode-text">
             {kcValues[petName]}
           </Typography>
         )}
