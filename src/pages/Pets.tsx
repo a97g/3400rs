@@ -107,11 +107,14 @@ export default function Pets() {
   const getPetCount = async () => {
     const proxyUrl = 'https://corsproxy.io/?';
     const url = `https://templeosrs.com/api/collection-log/player_collection_log.php?player=${player}&categories=all_pets,chambers_of_xeric,theatre_of_blood,tombs_of_amascut`;
-
+    const fallbackurl = 'https://templeosrs.com/api/pets/pet_count.php';
+    const params = new URLSearchParams({ player: player, count: '200' });
+    
     try {
       if (!isGroup) {
         // Only fetch from the new endpoint for individual mode
-        const response = await axios.get(proxyUrl + encodeURIComponent(url));
+        let response;
+        response = await axios.get(proxyUrl + encodeURIComponent(url));
         if (response && response.data.data) {
           // Map the response to your PetCountResponse structure
           const data = response.data.data;
@@ -177,6 +180,15 @@ export default function Pets() {
               rank: 0
             }
           });
+        } else if (response && response.data.error) {
+          // fallback to previous endpoint if new one fails
+          response = await axios.get(proxyUrl + encodeURIComponent(fallbackurl + '?' + params.toString()));
+          if (response && response.data.data) {
+            setPetCounts(response.data.data);
+          } else {
+            setRsnError(true);
+            setTimeout(() => setRsnError(false), 5000);
+          }
         } else {
           setRsnError(true);
           setTimeout(() => setRsnError(false), 5000);
