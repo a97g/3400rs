@@ -69,3 +69,5 @@ export { default as Zebak } from './Zebak.png';
 export { default as Warden } from './Warden.png';
 export { default as Bran } from './Bran.png';
 export { default as Yami } from './Yami.png';
+export { default as Dom } from './Dom.png';
+

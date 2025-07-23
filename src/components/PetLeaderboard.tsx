@@ -73,7 +73,7 @@ export default function PetLeaderboard({ totalPets, totalHours, petCounts }: Pet
                     <Typography variant="body2" sx={{textAlign: 'center'}}>Pet Count</Typography>
                 </div>  
                 <Typography variant="body2" sx={{ display: 'flex', textAlign: 'center', alignItems: 'flex-end' }}>
-                  {62 - petCount.pet_count} missing
+                  {totalPets - petCount.pet_count} missing
                 </Typography>
                 <div style={{ height: "80px", width: "80px" }}>
                     <CircularProgressbar 
