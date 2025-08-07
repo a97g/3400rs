@@ -1,5 +1,5 @@
 import React, { useState, useEffect, RefObject } from 'react';
-import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, useMediaQuery, useTheme, Fade, Switch, FormControlLabel, FormGroup, ToggleButton as MuiToggleButton, ToggleButtonGroup as MuiToggleButtonGroup, Checkbox, Collapse } from '@mui/material';
+import { Box, Typography, TextField, Button, useMediaQuery, useTheme, Fade, Collapse } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import * as InvyPet from '../resources/pets/inv';
@@ -75,6 +75,31 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const [yamiContractsKcValues, setYamiContractsKcValues] = useState<{ [key: string]: string }>({});
   const [nidDestroyKcValues, setNidDestroyKcValues] = useState<{ [key: string]: string }>({});
   const [youngllefCorruptedKcValues, setYoungllefCorruptedKcValues] = useState<{ [key: string]: string }>({});
+  // Dual KC for wildy bosses
+  const [vetionCalvarionKcValues, setVetionCalvarionKcValues] = useState<{ [key: string]: string }>({});
+  const [callistoArtioKcValues, setCallistoArtioKcValues] = useState<{ [key: string]: string }>({});
+  const [venenatisSpindelKcValues, setVenenatisSpindelKcValues] = useState<{ [key: string]: string }>({});
+  // Dual KC for Lil' zik
+  const [lilZikHardKcValues, setLilZikHardKcValues] = useState<{ [key: string]: string }>({});
+  // Quad KC for Dom
+  const [dom6KcValues, setDom6KcValues] = useState<{ [key: string]: string }>({});
+  const [dom7KcValues, setDom7KcValues] = useState<{ [key: string]: string }>({});
+  const [dom8KcValues, setDom8KcValues] = useState<{ [key: string]: string }>({});
+  const [dom8plusKcValues, setDom8plusKcValues] = useState<{ [key: string]: string }>({});
+
+  // Handlers for new dual KC inputs
+  const handleVetionCalvarionKcChange = (petName: string, value: string) => {
+    setVetionCalvarionKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleCallistoArtioKcChange = (petName: string, value: string) => {
+    setCallistoArtioKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleVenenatisSpindelKcChange = (petName: string, value: string) => {
+    setVenenatisSpindelKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleLilZikHardKcChange = (petName: string, value: string) => {
+    setLilZikHardKcValues(prev => ({ ...prev, [petName]: value }));
+  };
 
   // Handlers for dual KC inputs
   const handleBranSacrificeKcChange = (petName: string, value: string) => {
@@ -89,6 +114,20 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const handleYoungllefCorruptedKcChange = (petName: string, value: string) => {
     setYoungllefCorruptedKcValues(prev => ({ ...prev, [petName]: value }));
   };
+  // Handlers for quad KC inputs
+  const handleDom6KcChange = (petName: string, value: string) => {
+    setDom6KcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleDom7KcChange = (petName: string, value: string) => {
+    setDom7KcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleDom8KcChange = (petName: string, value: string) => {
+    setDom8KcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleDom8plusKcChange = (petName: string, value: string) => {
+    setDom8plusKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+
   const [passedPets, setPassedPets] = useState(petCounts);
   const [exportedKcData, setExportedKcData] = useState<string | null>(null);
   const [petHoursMap, setPetHoursMap] = useState<{ [petName: string]: number }>({});
@@ -220,13 +259,24 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
         const kc2 = Number(secondaryKc || 0);
         let x = 0;
         if (primaryDropRate && secondaryDropRate && (kc1 > 0 || kc2 > 0)) {
-          // Combined probability: 1 - (1-p1)*(1-p2)
-          // p1 = 1 - (1 - 1/primaryDropRate)^kc1
-          // p2 = 1 - (1 - 1/secondaryDropRate)^kc2
-          const p1 = 1 - Math.pow(1 - 1/primaryDropRate, kc1);
-          const p2 = 1 - Math.pow(1 - 1/secondaryDropRate, kc2);
-          const combinedP = 1 - (1 - p1) * (1 - p2);
           x = kc1/primaryDropRate + kc2/secondaryDropRate;
+          return x < 10 ? x.toFixed(2) + 'x' : Math.round(x) + 'x';
+        }
+        return '';
+      }
+      function quadRateCalc(names: string[], kcs: string[]) {
+        let x = 0;
+        let hasAny = false;
+        for (let i = 0; i < 4; i++) {
+          const rateObj = petRates.find(r => r.pet === names[i]);
+          const dropRate = rateObj ? Number(rateObj.dropRate) : null;
+          const kc = Number(kcs[i] || 0);
+          if (dropRate && kc > 0) {
+            x += kc / dropRate;
+            hasAny = true;
+          }
+        }
+        if (hasAny) {
           return x < 10 ? x.toFixed(2) + 'x' : Math.round(x) + 'x';
         }
         return '';
@@ -241,6 +291,23 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
         newLikelihoodValues[petName] = dualRateCalc("Nid", "Nid (Destroy)", likelihoodKcValues[petName], nidDestroyKcValues[petName]);
       } else if (petName === "Youngllef") {
         newLikelihoodValues[petName] = dualRateCalc("Youngllef (Normal Gauntlet)", "Youngllef (Corrupted Gauntlet)", likelihoodKcValues[petName], youngllefCorruptedKcValues[petName]);
+      } else if (petName === "Vet'ion jr. ") {
+        newLikelihoodValues[petName] = dualRateCalc("Vet'ion jr. ", "Vet'ion jr. (Calvar'ion)", likelihoodKcValues[petName], vetionCalvarionKcValues[petName]);
+      } else if (petName === "Callisto cub") {
+        newLikelihoodValues[petName] = dualRateCalc("Callisto cub", "Callisto cub (Artio)", likelihoodKcValues[petName], callistoArtioKcValues[petName]);
+      } else if (petName === "Venenatis spiderling") {
+        newLikelihoodValues[petName] = dualRateCalc("Venenatis spiderling", "Venenatis spiderling (Spindel)", likelihoodKcValues[petName], venenatisSpindelKcValues[petName]);
+      } else if (petName === "Lil' zik") {
+        newLikelihoodValues[petName] = dualRateCalc("Lil' zik", "Lil' zik (Hard Mode)", likelihoodKcValues[petName], lilZikHardKcValues[petName]);
+      } else if (petName === "Dom") {
+        newLikelihoodValues[petName] = quadRateCalc([
+          "Dom 6", "Dom 7", "Dom 8", "Dom 8 plus"
+        ], [
+          dom6KcValues[petName],
+          dom7KcValues[petName],
+          dom8KcValues[petName],
+          dom8plusKcValues[petName]
+        ]);
       } else {
         const rateObj = petRates.find(r => r.pet === petName);
         const dropRate = rateObj ? Number(rateObj.dropRate) : null;
@@ -254,7 +321,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
       }
     });
     setLikelihoodValues(newLikelihoodValues);
-  }, [likelihoodKcValues, phosaniKcValues, branSacrificeKcValues, yamiContractsKcValues, nidDestroyKcValues, youngllefCorruptedKcValues, accountType, likelihoodMode]);
+  }, [likelihoodKcValues, phosaniKcValues, branSacrificeKcValues, yamiContractsKcValues, nidDestroyKcValues, youngllefCorruptedKcValues, vetionCalvarionKcValues, callistoArtioKcValues, venenatisSpindelKcValues, lilZikHardKcValues, dom6KcValues, dom7KcValues, dom8KcValues, dom8plusKcValues, accountType, likelihoodMode]);
   // For "Little nightmare": handle Phosani KC input
   const handlePhosaniKcChange = (petName: string, value: string) => {
     setPhosaniKcValues(prevState => ({
@@ -732,7 +799,7 @@ useEffect(() => {
     { main: "55", iron: "18", dropRate: "2800", pet: "Venenatis spiderling (Spindel)" },
     { main: "65", iron: "6.5", dropRate: "2000", pet: "Callisto cub" },
     { main: "65", iron: "32", dropRate: "2800", pet: "Callisto cub (Artio)" },
-    { main: "55", iron: "2", dropRate: "2000", pet: "Vet'ion jr." },
+    { main: "55", iron: "2", dropRate: "2000", pet: "Vet'ion jr. " },
     { main: "55", iron: "0.9", dropRate: "2800", pet: "Vet'ion jr. (Calvar'ion)" },
     { main: "130", iron: "81", dropRate: "2016", pet: "Scorpia's offspring" },
     { main: "2.5", iron: "100", dropRate: "67", pet: "Tzrek-jad" },
@@ -770,7 +837,7 @@ useEffect(() => {
     { main: "30", iron: "28", dropRate: "2500", pet: "Baron" },
     { main: "30", iron: "25", dropRate: "2500", pet: "Lil'viathan" },
     { main: "60", iron: "60", dropRate: "3000", pet: "Scurry" },
-    { main: "2.5", iron: "2.5", dropRate: "100", pet: "Smol heredit" },
+    { main: "2.5", iron: "2.5", dropRate: "100", pet: "Smol Heredit" },
     { main: "45", iron: "45", dropRate: "3000", pet: "Nid" },
     { main: "45", iron: "45", dropRate: "1500", pet: "Nid (Destroy)" },
     { main: "8.5", iron: "8.5", dropRate: "400", pet: "Huberte" },
@@ -781,6 +848,19 @@ useEffect(() => {
     { main: "10", iron: "10", dropRate: "100", pet: "Yami (Contracts)" },
     { main: "0", iron: "0", dropRate: "6500", pet: "Herbi" },
     { main: "0", iron: "0", dropRate: "1000", pet: "Quetzin" },
+    { main: "0", iron: "0", dropRate: "1000", pet: "Dom 6" },
+    { main: "0", iron: "0", dropRate: "750", pet: "Dom 7" },
+    { main: "0", iron: "0", dropRate: "500", pet: "Dom 8" },
+    { main: "0", iron: "0", dropRate: "250", pet: "Dom 8 plus" },
+
+    // { main: "0", iron: "0", dropRate: "1000", pet: "Rift guardian" },
+    // { main: "0", iron: "0", dropRate: "750", pet: "Beaver" },
+    // { main: "0", iron: "0", dropRate: "500", pet: "Rock golem" },
+    // { main: "0", iron: "0", dropRate: "250", pet: "Baby chinchompa" },
+    // { main: "0", iron: "0", dropRate: "1000", pet: "Rocky" },
+    // { main: "0", iron: "0", dropRate: "750", pet: "Tangleroot" },
+    // { main: "0", iron: "0", dropRate: "500", pet: "Heron" },
+    // { main: "0", iron: "0", dropRate: "250", pet: "Giant squirrel" },
   ];
 
 
@@ -1066,10 +1146,10 @@ useEffect(() => {
                               p: 1,
                               width: '100%',
                               maxWidth: 160,
-                              minHeight: likelihoodMode ? 310 : 195,
+                              minHeight: likelihoodMode ? 351 : 195,
                             }}
                           >
-                            <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, minHeight: 44}}>
+                            <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, minHeight: 44, maxHeight: 44}}>
                               <img src={petImage} alt={petName} style={{width: '100%', maxWidth: 40, height: 40, objectFit: 'contain', zIndex: 1}} />
                             </Box>
                             <Typography variant="body2" sx={{color: 'white', minHeight: 32, textAlign: 'center', wordBreak: 'break-word', fontSize: '0.85em', mb: 1}}>{petName}</Typography>
@@ -1108,7 +1188,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Little nightmare"
+                                      placeholder="Nightmare"
                                     />
                                     <TextField
                                       variant="outlined"
@@ -1123,7 +1203,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Phosani"
+                                      placeholder="Phosani"
                                     />
                                   </>
                                 ) : petName === "Bran" ? (
@@ -1142,7 +1222,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Bran"
+                                      placeholder="Bran"
                                     />
                                     <TextField
                                       variant="outlined"
@@ -1157,7 +1237,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Bran (Sacrifice)"
+                                      placeholder="Sacrifice"
                                     />
                                   </>
                                 ) : petName === "Yami" ? (
@@ -1176,7 +1256,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Yami"
+                                      placeholder="Yama"
                                     />
                                     <TextField
                                       variant="outlined"
@@ -1191,7 +1271,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Yami (Contracts)"
+                                      placeholder="Contracts"
                                     />
                                   </>
                                 ) : petName === "Nid" ? (
@@ -1210,7 +1290,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Nid"
+                                      placeholder="Araxxor"
                                     />
                                     <TextField
                                       variant="outlined"
@@ -1225,7 +1305,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Nid (Destroy)"
+                                      placeholder="Destroy"
                                     />
                                   </>
                                 ) : petName === "Youngllef" ? (
@@ -1244,7 +1324,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Youngllef (Normal Gauntlet)"
+                                      placeholder="Normal Gauntlet"
                                     />
                                     <TextField
                                       variant="outlined"
@@ -1259,7 +1339,228 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="KC for Youngllef (Corrupted Gauntlet)"
+                                      placeholder="Corrupted Gauntlet"
+                                    />
+                                  </>
+                                ) : petName === "Vet'ion jr. " ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Vet'ion"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={vetionCalvarionKcValues[petName] || ''}
+                                      onChange={(e) => handleVetionCalvarionKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Calvar'ion"
+                                    />
+                                  </>
+                                ) : petName === "Callisto cub" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Callisto"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={callistoArtioKcValues[petName] || ''}
+                                      onChange={(e) => handleCallistoArtioKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Artio"
+                                    />
+                                  </>
+                                ) : petName === "Venenatis spiderling" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Venenatis"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={venenatisSpindelKcValues[petName] || ''}
+                                      onChange={(e) => handleVenenatisSpindelKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Spindel"
+                                    />
+                                  </>
+                                ) : petName === "Lil' zik" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Reg"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={lilZikHardKcValues[petName] || ''}
+                                      onChange={(e) => handleLilZikHardKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="HMT"
+                                    />
+                                  </>
+                                ) : petName === "Dom" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={dom6KcValues[petName] || ''}
+                                      onChange={(e) => handleDom6KcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Wave 6"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={dom7KcValues[petName] || ''}
+                                      onChange={(e) => handleDom7KcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Wave 7"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={dom8KcValues[petName] || ''}
+                                      onChange={(e) => handleDom8KcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Wave 8"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={dom8plusKcValues[petName] || ''}
+                                      onChange={(e) => handleDom8plusKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Wave 8+"
+                                    />
+                                  </>
+                                ) : petName === "Olmlet" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Purples"
                                     />
                                   </>
                                 ) : (
