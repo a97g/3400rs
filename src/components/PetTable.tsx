@@ -69,6 +69,26 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const [likelihoodKcValues, setLikelihoodKcValues] = useState<{ [key: string]: string }>({});
   // Store the calculated rateDisplay for each pet
   const [likelihoodValues, setLikelihoodValues] = useState<{ [key: string]: string }>({});
+  // Dual KC states for pets with two rates
+  const [phosaniKcValues, setPhosaniKcValues] = useState<{ [key: string]: string }>({});
+  const [branSacrificeKcValues, setBranSacrificeKcValues] = useState<{ [key: string]: string }>({});
+  const [yamiContractsKcValues, setYamiContractsKcValues] = useState<{ [key: string]: string }>({});
+  const [nidDestroyKcValues, setNidDestroyKcValues] = useState<{ [key: string]: string }>({});
+  const [youngllefCorruptedKcValues, setYoungllefCorruptedKcValues] = useState<{ [key: string]: string }>({});
+
+  // Handlers for dual KC inputs
+  const handleBranSacrificeKcChange = (petName: string, value: string) => {
+    setBranSacrificeKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleYamiContractsKcChange = (petName: string, value: string) => {
+    setYamiContractsKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleNidDestroyKcChange = (petName: string, value: string) => {
+    setNidDestroyKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleYoungllefCorruptedKcChange = (petName: string, value: string) => {
+    setYoungllefCorruptedKcValues(prev => ({ ...prev, [petName]: value }));
+  };
   const [passedPets, setPassedPets] = useState(petCounts);
   const [exportedKcData, setExportedKcData] = useState<string | null>(null);
   const [petHoursMap, setPetHoursMap] = useState<{ [petName: string]: number }>({});
@@ -186,23 +206,80 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     }));
   };
 
-  // Update likelihoodValues (rateDisplay) whenever likelihoodKcValues or accountType changes
+  // Update likelihoodValues (rateDisplay) whenever likelihoodKcValues, phosaniKcValues, or accountType changes
   useEffect(() => {
     if (!likelihoodMode) return;
     const newLikelihoodValues: { [key: string]: string } = {};
     Object.keys(likelihoodKcValues).forEach(petName => {
-      const rateObj = petRates.find(r => r.pet === petName);
-      const dropRate = rateObj ? Number(rateObj.dropRate) : null;
-      const kc = Number(likelihoodKcValues[petName] || 0);
-      if (dropRate && kc > 0) {
-        const x = kc / dropRate;
-        newLikelihoodValues[petName] = x < 10 ? x.toFixed(2) + 'x' : Math.round(x) + 'x';
+      function dualRateCalc(primaryName: string, secondaryName: string, primaryKc: string, secondaryKc: string) {
+        const primaryRateObj = petRates.find(r => r.pet === primaryName);
+        const secondaryRateObj = petRates.find(r => r.pet === secondaryName);
+        const primaryDropRate = primaryRateObj ? Number(primaryRateObj.dropRate) : null;
+        const secondaryDropRate = secondaryRateObj ? Number(secondaryRateObj.dropRate) : null;
+        const kc1 = Number(primaryKc || 0);
+        const kc2 = Number(secondaryKc || 0);
+        let x = 0;
+        if (primaryDropRate && secondaryDropRate && (kc1 > 0 || kc2 > 0)) {
+          // Combined probability: 1 - (1-p1)*(1-p2)
+          // p1 = 1 - (1 - 1/primaryDropRate)^kc1
+          // p2 = 1 - (1 - 1/secondaryDropRate)^kc2
+          const p1 = 1 - Math.pow(1 - 1/primaryDropRate, kc1);
+          const p2 = 1 - Math.pow(1 - 1/secondaryDropRate, kc2);
+          const combinedP = 1 - (1 - p1) * (1 - p2);
+          x = kc1/primaryDropRate + kc2/secondaryDropRate;
+          return x < 10 ? x.toFixed(2) + 'x' : Math.round(x) + 'x';
+        }
+        return '';
+      }
+      if (petName === "Little nightmare") {
+        newLikelihoodValues[petName] = dualRateCalc("Little nightmare", "Phosani", likelihoodKcValues[petName], phosaniKcValues[petName]);
+      } else if (petName === "Bran") {
+        newLikelihoodValues[petName] = dualRateCalc("Bran", "Bran (Sacrifice)", likelihoodKcValues[petName], branSacrificeKcValues[petName]);
+      } else if (petName === "Yami") {
+        newLikelihoodValues[petName] = dualRateCalc("Yami", "Yami (Contracts)", likelihoodKcValues[petName], yamiContractsKcValues[petName]);
+      } else if (petName === "Nid") {
+        newLikelihoodValues[petName] = dualRateCalc("Nid", "Nid (Destroy)", likelihoodKcValues[petName], nidDestroyKcValues[petName]);
+      } else if (petName === "Youngllef") {
+        newLikelihoodValues[petName] = dualRateCalc("Youngllef (Normal Gauntlet)", "Youngllef (Corrupted Gauntlet)", likelihoodKcValues[petName], youngllefCorruptedKcValues[petName]);
       } else {
-        newLikelihoodValues[petName] = '';
+        const rateObj = petRates.find(r => r.pet === petName);
+        const dropRate = rateObj ? Number(rateObj.dropRate) : null;
+        const kc = Number(likelihoodKcValues[petName] || 0);
+        if (dropRate && kc > 0) {
+          const x = kc / dropRate;
+          newLikelihoodValues[petName] = x < 10 ? x.toFixed(2) + 'x' : Math.round(x) + 'x';
+        } else {
+          newLikelihoodValues[petName] = '';
+        }
       }
     });
     setLikelihoodValues(newLikelihoodValues);
-  }, [likelihoodKcValues, accountType, likelihoodMode]);
+  }, [likelihoodKcValues, phosaniKcValues, branSacrificeKcValues, yamiContractsKcValues, nidDestroyKcValues, youngllefCorruptedKcValues, accountType, likelihoodMode]);
+  // For "Little nightmare": handle Phosani KC input
+  const handlePhosaniKcChange = (petName: string, value: string) => {
+    setPhosaniKcValues(prevState => ({
+      ...prevState,
+      [petName]: value
+    }));
+  };
+
+  // Helper: set cookie
+  // Use localStorage for pet data persistence
+  const setPetDataStorage = (value: string) => {
+    try {
+      localStorage.setItem('petData', value);
+    } catch (e) {
+      // Ignore storage errors
+    }
+  };
+
+  const getPetDataStorage = () => {
+    try {
+      return localStorage.getItem('petData') || '';
+    } catch (e) {
+      return '';
+    }
+  };
 
   const handleExportPetData = () => {
     let exportSource: { [key: string]: PetCountResponse };
@@ -223,14 +300,22 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
       return acc;
     }, {} as { [key: string]: { [key: string]: string | number } });
 
+
     // Export likelihoodKcValues (rate input) for obtained pets
-    const likelihoodKcExport: { [key: string]: { [key: string]: string } } = {};
+    const likelihoodKcExport: { [key: string]: { [key: string]: string | { ln: string, phosani: string } } } = {};
     Object.keys(exportSource).forEach(key => {
       const petCount = exportSource[key];
       const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
-      const kcObj: { [key: string]: string } = {};
+      const kcObj: { [key: string]: string | { ln: string, phosani: string } } = {};
       obtainedPets.forEach(petName => {
-        kcObj[petName] = likelihoodKcValues[petName] || '';
+        if (petName === "Little nightmare") {
+          kcObj[petName] = {
+            ln: likelihoodKcValues[petName] || '',
+            phosani: phosaniKcValues[petName] || ''
+          };
+        } else {
+          kcObj[petName] = likelihoodKcValues[petName] || '';
+        }
       });
       likelihoodKcExport[key] = kcObj;
     });
@@ -248,14 +333,114 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     };
     const exportedString = JSON.stringify(exportedData, null, 2);
     setExportedKcData(exportedString);
+    // Store in localStorage
+    setPetDataStorage(exportedString);
     navigator.clipboard.writeText(exportedString)
       .then(() => {
-        alert('Pet data copied to clipboard!');
+        alert('Pet data copied to clipboard and saved!');
       })
       .catch(err => {
         console.error('Failed to copy pet data: ', err);
       });
+
   };
+
+// On mount, load pet data from localStorage if available
+useEffect(() => {
+  const storedData = getPetDataStorage();
+  if (storedData) {
+    try {
+      const importedData = JSON.parse(storedData);
+      // Handle pets
+      const petsData = importedData.pets || importedData; // fallback for old format
+      const newKcValues = Object.keys(petsData).reduce((acc, key) => {
+        const petData = petsData[key];
+        Object.keys(petData).forEach(petName => {
+          acc[petName] = petData[petName].toString();
+        });
+        return acc;
+      }, {} as { [key: string]: string });
+      setKcValues(newKcValues);
+
+      setLikelihoodKcValues(prev => {
+        const updated = { ...prev };
+        Object.keys(newKcValues).forEach(petName => {
+          if (!prev[petName] || prev[petName] === '') {
+            const sanitized = newKcValues[petName].replace(/[^0-9]/g, '');
+            updated[petName] = sanitized;
+          }
+        });
+        return updated;
+      });
+
+
+      if (importedData.likelihoodKcValues) {
+        const allKc: { [key: string]: string } = {};
+        const allPhosani: { [key: string]: string } = {};
+        Object.values(importedData.likelihoodKcValues).forEach((kcObj: any) => {
+          Object.entries(kcObj).forEach(([petName, kc]) => {
+            if (petName === "Little nightmare" && typeof kc === 'object' && kc !== null) {
+              const kcObj = kc as { ln?: string; phosani?: string };
+              allKc[petName] = kcObj.ln || '';
+              allPhosani[petName] = kcObj.phosani || '';
+            } else {
+              allKc[petName] = kc as string;
+            }
+          });
+        });
+        setLikelihoodKcValues(allKc);
+        setPhosaniKcValues(allPhosani);
+      }
+
+      if (manualMode) {
+        const updatedPets: PetData = { ...manualPets.pets };
+        Object.keys(newKcValues).forEach(petName => {
+          const val = newKcValues[petName];
+          updatedPets[petName] = val !== "0" && val !== null && val !== undefined && val !== '' ? 1 : 0;
+        });
+        const newPetCount = Object.values(updatedPets).filter(v => v === 1).length;
+        setManualPets(prev => ({
+          ...prev,
+          pets: updatedPets,
+          pet_count: newPetCount
+        }));
+      }
+      if (importedData.petCountColor) onSetPetCountColor(importedData.petCountColor);
+      if (importedData.petHoursColor) onSetPetHoursColor(importedData.petHoursColor);
+      if (importedData.petBgColor1) onSetPetBgColor1(importedData.petBgColor1);
+      if (importedData.petBgColor2) onSetPetBgColor2(importedData.petBgColor2);
+      if (importedData.player) {
+        onSetPlayer(importedData.player);
+        if (manualMode) {
+          setManualPets(prev => ({
+            ...prev,
+            player: importedData.player
+          }));
+        } else {
+          setPassedPets(prev => {
+            const keys = Object.keys(prev);
+            if (keys.length > 0) {
+              const firstKey = keys[0];
+              return {
+                ...prev,
+                [firstKey]: {
+                  ...prev[firstKey],
+                  player: importedData.player
+                }
+              };
+            }
+            return prev;
+          });
+        }
+      }
+      if (typeof importedData.hideAvatar === 'boolean') onSetHideAvatar(importedData.hideAvatar);
+      if (typeof importedData.isCompact === 'boolean') onSetIsCompact(importedData.isCompact);
+    } catch (e) {
+      // Ignore parse errors
+    }
+  }
+  // eslint-disable-next-line
+}, []);
 
   const handleImportPetData = () => {
     navigator.clipboard.readText()
@@ -289,12 +474,20 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
         if (importedData.likelihoodKcValues) {
           // Flatten all pets from all keys into one object
           const allKc: { [key: string]: string } = {};
+          const allPhosani: { [key: string]: string } = {};
           Object.values(importedData.likelihoodKcValues).forEach((kcObj: any) => {
             Object.entries(kcObj).forEach(([petName, kc]) => {
-              allKc[petName] = kc as string;
+              if (petName === "Little nightmare" && typeof kc === 'object' && kc !== null) {
+                const kcObj = kc as { ln?: string; phosani?: string };
+                allKc[petName] = kcObj.ln || '';
+                allPhosani[petName] = kcObj.phosani || '';
+              } else {
+                allKc[petName] = kc as string;
+              }
             });
           });
           setLikelihoodKcValues(allKc);
+          setPhosaniKcValues(allPhosani);
         }
 
         if (manualMode) {
@@ -584,7 +777,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     { main: "84", iron: "84", dropRate: "3000", pet: "Moxi" },
     { main: "60", iron: "60", dropRate: "3000", pet: "Bran" },
     { main: "60", iron: "60", dropRate: "1500", pet: "Bran (Sacrifice)" },
-    { main: "10", iron: "10", dropRate: "100", pet: "Yami" },
+    { main: "10", iron: "10", dropRate: "1000", pet: "Yami" },
+    { main: "10", iron: "10", dropRate: "100", pet: "Yami (Contracts)" },
     { main: "0", iron: "0", dropRate: "6500", pet: "Herbi" },
     { main: "0", iron: "0", dropRate: "1000", pet: "Quetzin" },
   ];
@@ -872,7 +1066,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                               p: 1,
                               width: '100%',
                               maxWidth: 160,
-                              minHeight: likelihoodMode ? 210 : 140,
+                              minHeight: likelihoodMode ? 310 : 195,
                             }}
                           >
                             <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, minHeight: 44}}>
@@ -893,25 +1087,198 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
                               InputProps={{
                                 style: { color: 'white', textAlign: 'center' },
                               }}
+                              placeholder="KC Display"
                             />
                             {likelihoodMode && (
                               <>
                                 <Typography variant="body2" sx={{color: 'white', minHeight: 32, textAlign: 'center', wordBreak: 'break-word', fontSize: '0.85em', mt: 1}}>Rate Display</Typography>
-                                <TextField
-                                  variant="outlined"
-                                  size="small"
-                                  value={likelihoodKcValues[petName] || ''}
-                                  onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
-                                  sx={{
-                                    width: '90%',
-                                    input: { color: 'white', textAlign: 'center' },
-                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
-                                  }}
-                                  InputProps={{
-                                    style: { color: 'white', textAlign: 'center' },
-                                  }}
-                                  placeholder="KC for rate"
-                                />
+                                {petName === "Little nightmare" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Little nightmare"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={phosaniKcValues[petName] || ''}
+                                      onChange={(e) => handlePhosaniKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Phosani"
+                                    />
+                                  </>
+                                ) : petName === "Bran" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Bran"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={branSacrificeKcValues[petName] || ''}
+                                      onChange={(e) => handleBranSacrificeKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Bran (Sacrifice)"
+                                    />
+                                  </>
+                                ) : petName === "Yami" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Yami"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={yamiContractsKcValues[petName] || ''}
+                                      onChange={(e) => handleYamiContractsKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Yami (Contracts)"
+                                    />
+                                  </>
+                                ) : petName === "Nid" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Nid"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={nidDestroyKcValues[petName] || ''}
+                                      onChange={(e) => handleNidDestroyKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Nid (Destroy)"
+                                    />
+                                  </>
+                                ) : petName === "Youngllef" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Youngllef (Normal Gauntlet)"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={youngllefCorruptedKcValues[petName] || ''}
+                                      onChange={(e) => handleYoungllefCorruptedKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="KC for Youngllef (Corrupted Gauntlet)"
+                                    />
+                                  </>
+                                ) : (
+                                  <TextField
+                                    variant="outlined"
+                                    size="small"
+                                    value={likelihoodKcValues[petName] || ''}
+                                    onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                    sx={{
+                                      width: '90%',
+                                      input: { color: 'white', textAlign: 'center' },
+                                      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                    }}
+                                    InputProps={{
+                                      style: { color: 'white', textAlign: 'center' },
+                                    }}
+                                    placeholder="KC for Rate"
+                                  />
+                                )}
                                 <Typography variant="overline" sx={{color: rateColor, mt: 0.5, minHeight: 18, textAlign: 'center'}}>{likelihoodValues[petName]}</Typography>
                               </>
                             )}
