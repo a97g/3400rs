@@ -4,7 +4,7 @@ import { Box, Button, Divider, IconButton, InputBase, Paper, Tooltip, Typography
 import Page from '../components/Page';
 import nav3400rs from "../resources/nav/nav3400rs.png";
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, BadgeOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, BadgeOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore, StackedLineChartOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 import goldavi from '../resources/pets/assets/goldavi.png';
 // import Temple from '../resources/pets/assets/temple.svg';
@@ -37,6 +37,7 @@ export default function Pets() {
   const [combinedMissing, setCombinedMissing] = useState(false);
   const [manualMode, setManualMode] = useState(false);
   const [kcMode, setKcMode] = useState(false);
+  const [likelihoodMode, setLikelihoodMode] = useState(false);
   const [petBgColor1, setPetBgColor1] = useState('#492023');
   const [petBgColor2, setPetBgColor2] = useState('#463827');
   const [asciiGen, setAsciiGen] = useState(false);
@@ -415,10 +416,15 @@ export default function Pets() {
                             Manual Mode
                             <Checkbox checked={manualMode} onChange={() => { setManualMode(!manualMode); }} color="default"/>
                           </Button>
-                          <Button variant="contained" onClick={() => { setKcMode(!kcMode); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                          <Button variant="contained" onClick={() => { setKcMode(!kcMode); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', mb: 3, justifyContent: 'space-between' }} >
                             <NumbersOutlined />
                             Kc Mode
                             <Checkbox checked={kcMode} onChange={() => { setKcMode(!kcMode); }} color="default"/>
+                          </Button>
+                          <Button variant="contained" onClick={() => { setLikelihoodMode(!likelihoodMode); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                            <StackedLineChartOutlined />
+                            Likelihood Mode
+                            <Checkbox checked={likelihoodMode} onChange={() => { setLikelihoodMode(!likelihoodMode); }} color="default"/>
                           </Button>
                         </>
                       )}
@@ -508,7 +514,7 @@ export default function Pets() {
                           </Box>
                         </Zoom> 
                       )}
-                        <Button variant="outlined" className="dropdown-button" sx={{border: 0, mb: 2, mt: 1, display: 'flex', justifyContent: 'space-between', color: '#656566', "&:hover": {backgroundColor: "#1b1d1a"},"&:active": {backgroundColor: "#1b1d1a"}}} onClick={() => {setColorSettingsOpen(!colorSettingsOpen);}} disableRipple>
+                        <Button variant="outlined" className="dropdown-button" sx={{border: 0, mb: 2, mt: 1, display: 'flex', justifyContent: 'space-between', color: '#656566', "&:hover": {backgroundColor: "#1b1a1d"},"&:active": {backgroundColor: "#1b1d1a"}}} onClick={() => {setColorSettingsOpen(!colorSettingsOpen);}} disableRipple>
                           <Typography>
                           Color Settings
                           </Typography>
@@ -615,10 +621,15 @@ export default function Pets() {
                         Manual Mode
                         <Checkbox checked={manualMode} onChange={() => { setManualMode(!manualMode); }} color="default"/>
                       </Button>
-                      <Button variant="contained" onClick={() => { setKcMode(!kcMode); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
+                      <Button variant="contained" onClick={() => { setKcMode(!kcMode); }} className='setting-button settings-toggle' sx={{ display: 'flex', mb: 3, alignItems: 'center', justifyContent: 'space-between' }} >
                         <NumbersOutlined />
                         Kc Mode
                         <Checkbox checked={kcMode} onChange={() => { setKcMode(!kcMode); }} color="default"/>
+                      </Button>
+                      <Button variant="contained" onClick={() => { setLikelihoodMode(!likelihoodMode); }} className='setting-button settings-toggle' sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }} >
+                        <StackedLineChartOutlined />
+                        Likelihood Mode
+                        <Checkbox checked={likelihoodMode} onChange={() => { setLikelihoodMode(!likelihoodMode); }} color="default"/>
                       </Button>
                     </>
                   )}
@@ -904,6 +915,7 @@ export default function Pets() {
                 combinedMissing={combinedMissing} 
                 manualMode={manualMode}
                 kcMode={kcMode}
+                likelihoodMode={likelihoodMode}
                 ref={ref}
                 petCountColor={petCountColor}
                 petHoursColor={petHoursColor}

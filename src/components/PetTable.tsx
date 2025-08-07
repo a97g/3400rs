@@ -1,5 +1,5 @@
 import React, { useState, useEffect, RefObject } from 'react';
-import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, useMediaQuery, useTheme, Fade } from '@mui/material';
+import { Box, Typography, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, useMediaQuery, useTheme, Fade, Switch, FormControlLabel, FormGroup, ToggleButton as MuiToggleButton, ToggleButtonGroup as MuiToggleButtonGroup, Checkbox, Collapse } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import * as InvyPet from '../resources/pets/inv';
@@ -36,6 +36,7 @@ interface PetTableProps {
   combinedMissing: boolean;
   manualMode: boolean;
   kcMode: boolean;
+  likelihoodMode: boolean;
   ref: RefObject<HTMLDivElement>;
   petCountColor: string;
   petHoursColor: string;
@@ -54,7 +55,7 @@ interface PetTableProps {
   isCompact?: boolean;
 }
 
-export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, ref, petCountColor, petHoursColor, petBgColor1, petBgColor2, avatarImage, isCompact, hideAvatar, player, onSetPetCountColor, onSetPetHoursColor, onSetPetBgColor1, onSetPetBgColor2, onSetPlayer, onSetHideAvatar, onSetIsCompact }: PetTableProps) {
+export default function PetTable({ totalPets, totalHours, petCounts, transmogs, isGroup, missingMode, detailedMode, showDusts, showToa, combinedMissing, manualMode, kcMode, likelihoodMode, ref, petCountColor, petHoursColor, petBgColor1, petBgColor2, avatarImage, isCompact, hideAvatar, player, onSetPetCountColor, onSetPetHoursColor, onSetPetBgColor1, onSetPetBgColor2, onSetPlayer, onSetHideAvatar, onSetIsCompact }: PetTableProps) {
   const [manualPets, setManualPets] = useState<PetCountResponse>({
     pet_count: 0,
     pet_hours: 0,
@@ -64,9 +65,18 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   });
   // const [confirmed, setConfirmed] = useState(false);
   const [kcValues, setKcValues] = useState<{ [key: string]: string }>({});
+  // For likelihood mode: per-pet KC for rate calculation
+  const [likelihoodKcValues, setLikelihoodKcValues] = useState<{ [key: string]: string }>({});
+  // Store the calculated rateDisplay for each pet
+  const [likelihoodValues, setLikelihoodValues] = useState<{ [key: string]: string }>({});
   const [passedPets, setPassedPets] = useState(petCounts);
   const [exportedKcData, setExportedKcData] = useState<string | null>(null);
   const [petHoursMap, setPetHoursMap] = useState<{ [petName: string]: number }>({});
+  const [accountType, setAccountType] = useState<'main' | 'ironman'>('main');
+  const [kcExportOpen, setKcExportOpen] = useState(false);
+  const [kcTableOpen, setKcTableOpen] = useState(true);
+  const [likelihoodExportOpen, setLikelihoodExportOpen] = useState(false);
+  const [likelihoodTableOpen, setLikelihoodTableOpen] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -168,6 +178,32 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     }));
   };
 
+  // For likelihood mode: handle per-pet KC for rate calculation
+  const handleLikelihoodKcChange = (petName: string, value: string) => {
+    setLikelihoodKcValues(prevState => ({
+      ...prevState,
+      [petName]: value
+    }));
+  };
+
+  // Update likelihoodValues (rateDisplay) whenever likelihoodKcValues or accountType changes
+  useEffect(() => {
+    if (!likelihoodMode) return;
+    const newLikelihoodValues: { [key: string]: string } = {};
+    Object.keys(likelihoodKcValues).forEach(petName => {
+      const rateObj = petRates.find(r => r.pet === petName);
+      const dropRate = rateObj ? Number(rateObj.dropRate) : null;
+      const kc = Number(likelihoodKcValues[petName] || 0);
+      if (dropRate && kc > 0) {
+        const x = kc / dropRate;
+        newLikelihoodValues[petName] = x < 10 ? x.toFixed(2) + 'x' : Math.round(x) + 'x';
+      } else {
+        newLikelihoodValues[petName] = '';
+      }
+    });
+    setLikelihoodValues(newLikelihoodValues);
+  }, [likelihoodKcValues, accountType, likelihoodMode]);
+
   const handleExportPetData = () => {
     let exportSource: { [key: string]: PetCountResponse };
     if (manualMode) {
@@ -175,17 +211,33 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     } else {
       exportSource = passedPets;
     }
+    // Export kc values and likelihood rates per pet
+    const petsExport = Object.keys(exportSource).reduce((acc, key) => {
+      const petCount = exportSource[key];
+      const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
+      const petData = obtainedPets.reduce((petAcc, petName) => {
+        petAcc[petName] = kcValues[petName] || 0;
+        return petAcc;
+      }, {} as { [key: string]: string | number });
+      acc[key] = petData;
+      return acc;
+    }, {} as { [key: string]: { [key: string]: string | number } });
+
+    // Export likelihoodKcValues (rate input) for obtained pets
+    const likelihoodKcExport: { [key: string]: { [key: string]: string } } = {};
+    Object.keys(exportSource).forEach(key => {
+      const petCount = exportSource[key];
+      const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
+      const kcObj: { [key: string]: string } = {};
+      obtainedPets.forEach(petName => {
+        kcObj[petName] = likelihoodKcValues[petName] || '';
+      });
+      likelihoodKcExport[key] = kcObj;
+    });
+
     const exportedData = {
-      pets: Object.keys(exportSource).reduce((acc, key) => {
-        const petCount = exportSource[key];
-        const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
-        const petData = obtainedPets.reduce((petAcc, petName) => {
-          petAcc[petName] = kcValues[petName] || 0;
-          return petAcc;
-        }, {} as { [key: string]: string | number });
-        acc[key] = petData;
-        return acc;
-      }, {} as { [key: string]: { [key: string]: string | number } }),
+      pets: petsExport,
+      likelihoodKcValues: likelihoodKcExport,
       petCountColor,
       petHoursColor,
       petBgColor1,
@@ -219,6 +271,32 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
           return acc;
         }, {} as { [key: string]: string });
         setKcValues(newKcValues);
+
+        // If likelihoodKcValues is empty for a pet, set it to sanitized KC value
+        setLikelihoodKcValues(prev => {
+          const updated = { ...prev };
+          Object.keys(newKcValues).forEach(petName => {
+            if (!prev[petName] || prev[petName] === '') {
+              // Remove commas and non-digit characters
+              const sanitized = newKcValues[petName].replace(/[^0-9]/g, '');
+              updated[petName] = sanitized;
+            }
+          });
+          return updated;
+        });
+
+        // Restore likelihoodKcValues (rate input) if present
+        if (importedData.likelihoodKcValues) {
+          // Flatten all pets from all keys into one object
+          const allKc: { [key: string]: string } = {};
+          Object.values(importedData.likelihoodKcValues).forEach((kcObj: any) => {
+            Object.entries(kcObj).forEach(([petName, kc]) => {
+              allKc[petName] = kc as string;
+            });
+          });
+          setLikelihoodKcValues(allKc);
+        }
+
         if (manualMode) {
           const updatedPets: PetData = { ...manualPets.pets };
           Object.keys(newKcValues).forEach(petName => {
@@ -290,6 +368,25 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
             {kcValues[petName]}
           </Typography>
         )}
+        {likelihoodMode && petIconClass === 'obtained-pet-icon' && (() => {
+          // Color logic for rateDisplay (copied from grid rendering)
+          let rateColor = 'white';
+          const rateObj = petRates.find(r => r.pet === petName);
+          const dropRate = rateObj ? Number(rateObj.dropRate) : null;
+          const kc = Number(likelihoodKcValues[petName] || 0);
+          if (dropRate && kc > 0) {
+            const x = kc / dropRate;
+            if (x < 1.25) rateColor = 'limegreen';
+            else if (x < 2) rateColor = 'yellow';
+            else if (x < 3) rateColor = 'orange';
+            else if (x >= 3) rateColor = 'red';
+          }
+          return (
+            <Typography variant="body2" className="likelihood-mode-text" sx={{ color: rateColor }}>
+              {likelihoodValues[petName]}
+            </Typography>
+          );
+        })()}
       </Box>
     );
   };
@@ -419,6 +516,79 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     { petName: "Yami", hours: 10 },
     { petName: "Dom", hours: 0 }
   ];
+
+  const petRates = [
+    { main: "100", iron: "48", dropRate: "300", pet: "Pet chaos elemental" },
+    { main: "88", iron: "22", dropRate: "5000", pet: "Pet dagannoth supreme" },
+    { main: "88", iron: "25", dropRate: "5000", pet: "Pet dagannoth prime" },
+    { main: "88", iron: "25", dropRate: "5000", pet: "Pet dagannoth rex" },
+    { main: "3.25", iron: "26", dropRate: "1000", pet: "Pet penance queen" },
+    { main: "50", iron: "95", dropRate: "5000", pet: "Pet kree'arra" },
+    { main: "55", iron: "105", dropRate: "5000", pet: "Pet general graardor" },
+    { main: "65", iron: "100", dropRate: "5000", pet: "Pet k'ril tsutsaroth" },
+    { main: "65", iron: "85", dropRate: "5000", pet: "Pet zilyana" },
+    { main: "90", iron: "30", dropRate: "3000", pet: "Baby mole" },
+    { main: "120", iron: "75", dropRate: "3000", pet: "Prince black dragon" },
+    { main: "50", iron: "23", dropRate: "3000", pet: "Kalphite princess" },
+    { main: "110", iron: "35", dropRate: "3000", pet: "Pet smoke devil" },
+    { main: "100", iron: "18", dropRate: "3000", pet: "Pet kraken" },
+    { main: "65", iron: "48", dropRate: "5000", pet: "Pet dark core" },
+    { main: "44", iron: "80", dropRate: "4000", pet: "Pet snakeling" },
+    { main: "300", iron: "75", dropRate: "500", pet: "Chompy chick" },
+    { main: "55", iron: "60", dropRate: "2000", pet: "Venenatis spiderling" },
+    { main: "55", iron: "18", dropRate: "2800", pet: "Venenatis spiderling (Spindel)" },
+    { main: "65", iron: "6.5", dropRate: "2000", pet: "Callisto cub" },
+    { main: "65", iron: "32", dropRate: "2800", pet: "Callisto cub (Artio)" },
+    { main: "55", iron: "2", dropRate: "2000", pet: "Vet'ion jr." },
+    { main: "55", iron: "0.9", dropRate: "2800", pet: "Vet'ion jr. (Calvar'ion)" },
+    { main: "130", iron: "81", dropRate: "2016", pet: "Scorpia's offspring" },
+    { main: "2.5", iron: "100", dropRate: "67", pet: "Tzrek-jad" },
+    { main: "2", iron: "54", dropRate: "100", pet: "Tzrek-jad (Offtask)" },
+    { main: "65", iron: "32", dropRate: "3000", pet: "Hellpuppy" },
+    { main: "45", iron: "38", dropRate: "2560", pet: "Abyssal orphan" },
+    { main: "50", iron: "50", dropRate: "5000", pet: "Phoenix" },
+    { main: "1.71", iron: "12", dropRate: "178", pet: "Phoenix (Solo)" },
+    { main: "3.5", iron: "2.7", dropRate: "53", pet: "Olmlet" },
+    { main: "3", iron: "1.8", dropRate: "1210", pet: "Olmlet (Challenge mode)" },
+    { main: "1", iron: "80", dropRate: "65", pet: "Skotos" },
+    { main: "1", iron: "31", dropRate: "43", pet: "Jal-nib-rek" },
+    { main: "0.67", iron: "33", dropRate: "50", pet: "Jal-nib-rek (Offtask)" },
+    { main: "36", iron: "9", dropRate: "3000", pet: "Noon" },
+    { main: "34", iron: "2.7", dropRate: "3000", pet: "Vorki" },
+    { main: "3", iron: "3", dropRate: "650", pet: "Lil' zik" },
+    { main: "2.8", iron: "2.3", dropRate: "500", pet: "Lil' zik (Hard Mode)" },
+    { main: "30", iron: "27", dropRate: "3000", pet: "Ikkle hydra" },
+    { main: "100", iron: "50", dropRate: "3000", pet: "Sraracha" },
+    { main: "7", iron: "50", dropRate: "800", pet: "Youngllef (Corrupted Gauntlet)" },
+    { main: "10", iron: "56", dropRate: "2000", pet: "Youngllef (Normal Gauntlet)" },
+    { main: "40", iron: "40", dropRate: "2250", pet: "Smolcano" },
+    { main: "430", iron: "10", dropRate: "12000", pet: "Lil' creator" },
+    { main: "80", iron: "7.2", dropRate: "8000", pet: "Tiny tempor" },
+    { main: "23.5", iron: "9", dropRate: "4100", pet: "Nexling" },
+    { main: "39", iron: "6.5", dropRate: "4000", pet: "Abyssal protector" },
+    { main: "2.5", iron: "2.5", dropRate: "371", pet: "Tumeken's guardian" },
+    { main: "3.75", iron: "20", dropRate: "800", pet: "Little nightmare" },
+    { main: "7.5", iron: "3", dropRate: "1400", pet: "Phosani" },
+    { main: "6", iron: "6", dropRate: "1000", pet: "Bloodhound" },
+    { main: "0", iron: "0", dropRate: "400", pet: "Lil' Creator" },
+    { main: "30", iron: "25", dropRate: "2500", pet: "Muphin" },
+    { main: "21", iron: "21", dropRate: "2000", pet: "Wisp" },
+    { main: "37", iron: "33", dropRate: "3000", pet: "Butch" },
+    { main: "30", iron: "28", dropRate: "2500", pet: "Baron" },
+    { main: "30", iron: "25", dropRate: "2500", pet: "Lil'viathan" },
+    { main: "60", iron: "60", dropRate: "3000", pet: "Scurry" },
+    { main: "2.5", iron: "2.5", dropRate: "100", pet: "Smol heredit" },
+    { main: "45", iron: "45", dropRate: "3000", pet: "Nid" },
+    { main: "45", iron: "45", dropRate: "1500", pet: "Nid (Destroy)" },
+    { main: "8.5", iron: "8.5", dropRate: "400", pet: "Huberte" },
+    { main: "84", iron: "84", dropRate: "3000", pet: "Moxi" },
+    { main: "60", iron: "60", dropRate: "3000", pet: "Bran" },
+    { main: "60", iron: "60", dropRate: "1500", pet: "Bran (Sacrifice)" },
+    { main: "10", iron: "10", dropRate: "100", pet: "Yami" },
+    { main: "0", iron: "0", dropRate: "6500", pet: "Herbi" },
+    { main: "0", iron: "0", dropRate: "1000", pet: "Quetzin" },
+  ];
+
 
   const getTotalPetHours = () => {
     if (manualMode) {
@@ -630,54 +800,128 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
           </Box>
           {kcMode && (
             <>
-            <Typography variant='h4' sx={{fontWeight: 500, textAlign: 'center'}}>KC Mode</Typography>
-            <Box sx={{display: 'flex', mb: 2, justifyContent: 'space-evenly'}}>
-              <Button variant="contained" className='setting-button settings-toggle' onClick={handleImportPetData}>Import Data</Button>
-              <Button variant="contained" className='setting-button settings-toggle' onClick={handleExportPetData}>Export Data</Button>
-            </Box>
-            {exportedKcData && (
+              <Typography variant='h4' sx={{fontWeight: 500, textAlign: 'center'}}>KC Mode{likelihoodMode && ' + Likelihood'}</Typography>
+              <Box sx={{display: 'flex', mb: 2, justifyContent: 'space-evenly'}}>
+                <Button variant="contained" className='setting-button settings-toggle' onClick={handleImportPetData}>Import Data</Button>
+                <Button variant="contained" className='setting-button settings-toggle' onClick={handleExportPetData}>Export Data</Button>
+                <Button variant="contained" className='setting-button settings-toggle' onClick={() => setKcExportOpen(v => !v)}>{kcExportOpen ? 'Hide Export' : 'Show Export'}</Button>
+                <Button variant="contained" className='setting-button settings-toggle' onClick={() => setKcTableOpen(v => !v)}>{kcTableOpen ? 'Hide Table' : 'Show Table'}</Button>
+              </Box>
+              {exportedKcData && (
                 <Box sx={{mb: 2, mx: 'auto', maxWidth: 700}}>
-                  <Typography variant="body2" sx={{whiteSpace: 'pre-wrap', color: 'white', background: '#222', p: 2, borderRadius: 2}}>
-                    {exportedKcData}
-                  </Typography>
+                  <Collapse in={kcExportOpen}>
+                    <Typography variant="body2" sx={{whiteSpace: 'pre-wrap', color: 'white', background: '#222', p: 2, borderRadius: 2}}>
+                      {exportedKcData}
+                    </Typography>
+                  </Collapse>
                 </Box>
               )}
-              <Box sx={{display: 'flex', justifyContent: 'center'}}>
-              <TableContainer component={Paper} className="pet-container" sx={{ mt: 3, backgroundColor: '#0f0f0f' }}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{color: 'white', fontSize: '1.2em', textAlign: 'center'}}>Pet Name</TableCell>
-                      <TableCell sx={{color: 'white', fontSize: '1.2em', textAlign: 'center'}}>Kill Count</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {petOrder.filter(petName => getPetIconClass(petName, petCount.pets) === 'obtained-pet-icon').map((petName) => (
-                      <TableRow 
-                      key={petName}
-                      sx={{ 
-                        width: '100px',
-                         mb: 2,
-                        '& .MuiTableCell-root': {color: 'white !important'},
-                        '& .MuiInputBase-input': {color: 'white !important'},
-                        '& .MuiOutlinedInput-notchedOutline': {borderColor: 'white !important'},
+              <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+                <Collapse in={kcTableOpen} sx={{width: '100%'}}>
+                  <Box sx={{display: 'flex', justifyContent: 'center', width: '100%'}}>
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: {
+                          xs: 'repeat(3, 1fr)',
+                          sm: 'repeat(4, 1fr)',
+                          md: 'repeat(5, 1fr)',
+                          lg: 'repeat(6, 1fr)',
+                        },
+                        gap: 2,
+                        width: '100%',
+                        maxWidth: 1200,
+                        p: 2,
+                        justifyItems: 'center',
+                        alignItems: 'start',
                       }}
-                      >
-                        <TableCell sx={{textAlign: 'center'}}>{petName}</TableCell>
-                        <TableCell sx={{textAlign: 'center'}}>
-                          <TextField
-                            variant="outlined"
-                            size="small"
-                            value={kcValues[petName] || ''}
-                            onChange={(e) => handleKcChange(petName, e.target.value)}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+                    >
+                      {petOrder.filter(petName => getPetIconClass(petName, petCount.pets) === 'obtained-pet-icon').map((petName) => {
+                        const formatPetName = (name: string) => {
+                          return name.replace(/['-.]/g, '').replace(/\b\w/g, char => char.toUpperCase()).replace(/\s+/g, '');
+                        };
+                        const petImage = detailedMode ? DetailedPet[formatPetName(petName) as keyof typeof DetailedPet] : InvyPet[formatPetName(petName) as keyof typeof InvyPet];
+                        // For likelihood mode: get drop rate and calculate x
+                        let rateDisplay = '';
+                        let rateColor = 'white';
+                        if (likelihoodMode) {
+                          rateDisplay = likelihoodValues[petName] || '';
+                          // For color, recalculate x for color only
+                          const rateObj = petRates.find(r => r.pet === petName);
+                          const dropRate = rateObj ? Number(rateObj.dropRate) : null;
+                          const kc = Number(likelihoodKcValues[petName] || 0);
+                          if (dropRate && kc > 0) {
+                            const x = kc / dropRate;
+                            if (x < 1.25) rateColor = 'limegreen';
+                            else if (x < 2) rateColor = 'yellow';
+                            else if (x < 3) rateColor = 'orange';
+                            else if (x >= 3) rateColor = 'red';
+                          }
+                        }
+                        return (
+                          <Box
+                            key={petName}
+                            sx={{
+                              background: '#181818',
+                              borderRadius: 2,
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'flex-start',
+                              boxShadow: 2,
+                              p: 1,
+                              width: '100%',
+                              maxWidth: 160,
+                              minHeight: likelihoodMode ? 210 : 140,
+                            }}
+                          >
+                            <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1, minHeight: 44}}>
+                              <img src={petImage} alt={petName} style={{width: '100%', maxWidth: 40, height: 40, objectFit: 'contain', zIndex: 1}} />
+                            </Box>
+                            <Typography variant="body2" sx={{color: 'white', minHeight: 32, textAlign: 'center', wordBreak: 'break-word', fontSize: '0.85em', mb: 1}}>{petName}</Typography>
+                            <Typography variant="body2" sx={{color: 'white', minHeight: 32, textAlign: 'center', wordBreak: 'break-word', fontSize: '0.85em', mt: 1}}>Kc Display</Typography>
+                            <TextField
+                              variant="outlined"
+                              size="small"
+                              value={kcValues[petName] || ''}
+                              onChange={(e) => handleKcChange(petName, e.target.value)}
+                              sx={{
+                                width: '90%',
+                                input: { color: 'white', textAlign: 'center' },
+                                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                              }}
+                              InputProps={{
+                                style: { color: 'white', textAlign: 'center' },
+                              }}
+                            />
+                            {likelihoodMode && (
+                              <>
+                                <Typography variant="body2" sx={{color: 'white', minHeight: 32, textAlign: 'center', wordBreak: 'break-word', fontSize: '0.85em', mt: 1}}>Rate Display</Typography>
+                                <TextField
+                                  variant="outlined"
+                                  size="small"
+                                  value={likelihoodKcValues[petName] || ''}
+                                  onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                  sx={{
+                                    width: '90%',
+                                    input: { color: 'white', textAlign: 'center' },
+                                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                  }}
+                                  InputProps={{
+                                    style: { color: 'white', textAlign: 'center' },
+                                  }}
+                                  placeholder="KC for rate"
+                                />
+                                <Typography variant="overline" sx={{color: rateColor, mt: 0.5, minHeight: 18, textAlign: 'center'}}>{likelihoodValues[petName]}</Typography>
+                              </>
+                            )}
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  </Box>
+                </Collapse>
+              </Box>
             </>
           )}
         </div>
