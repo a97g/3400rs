@@ -63,11 +63,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     player: '',
     rank: 0
   });
-  // const [confirmed, setConfirmed] = useState(false);
   const [kcValues, setKcValues] = useState<{ [key: string]: string }>({});
-  // For likelihood mode: per-pet KC for rate calculation
   const [likelihoodKcValues, setLikelihoodKcValues] = useState<{ [key: string]: string }>({});
-  // Store the calculated rateDisplay for each pet
   const [likelihoodValues, setLikelihoodValues] = useState<{ [key: string]: string }>({});
   // Dual KC states for pets with two rates
   const [phosaniKcValues, setPhosaniKcValues] = useState<{ [key: string]: string }>({});
@@ -75,11 +72,9 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const [yamiContractsKcValues, setYamiContractsKcValues] = useState<{ [key: string]: string }>({});
   const [nidDestroyKcValues, setNidDestroyKcValues] = useState<{ [key: string]: string }>({});
   const [youngllefCorruptedKcValues, setYoungllefCorruptedKcValues] = useState<{ [key: string]: string }>({});
-  // Dual KC for wildy bosses
   const [vetionCalvarionKcValues, setVetionCalvarionKcValues] = useState<{ [key: string]: string }>({});
   const [callistoArtioKcValues, setCallistoArtioKcValues] = useState<{ [key: string]: string }>({});
   const [venenatisSpindelKcValues, setVenenatisSpindelKcValues] = useState<{ [key: string]: string }>({});
-  // Dual KC for Lil' zik
   const [lilZikHardKcValues, setLilZikHardKcValues] = useState<{ [key: string]: string }>({});
   // Quad KC for Dom
   const [dom6KcValues, setDom6KcValues] = useState<{ [key: string]: string }>({});
@@ -131,11 +126,9 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const [passedPets, setPassedPets] = useState(petCounts);
   const [exportedKcData, setExportedKcData] = useState<string | null>(null);
   const [petHoursMap, setPetHoursMap] = useState<{ [petName: string]: number }>({});
-  const [accountType, setAccountType] = useState<'main' | 'ironman'>('main');
+  // const [accountType, setAccountType] = useState<'main' | 'ironman'>('main');
   const [kcExportOpen, setKcExportOpen] = useState(false);
   const [kcTableOpen, setKcTableOpen] = useState(true);
-  const [likelihoodExportOpen, setLikelihoodExportOpen] = useState(false);
-  const [likelihoodTableOpen, setLikelihoodTableOpen] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -245,14 +238,13 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     }));
   };
 
-  // Update likelihoodValues (rateDisplay) whenever likelihoodKcValues, phosaniKcValues, or accountType changes
   useEffect(() => {
     if (!likelihoodMode) return;
     const newLikelihoodValues: { [key: string]: string } = {};
     Object.keys(likelihoodKcValues).forEach(petName => {
-      function dualRateCalc(primaryName: string, secondaryName: string, primaryKc: string, secondaryKc: string) {
-        const primaryRateObj = petRates.find(r => r.pet === primaryName);
-        const secondaryRateObj = petRates.find(r => r.pet === secondaryName);
+      function dualRateCalc(primaryName: string, secondaryName: string, primaryKc: string, secondaryKc: string, petRates: any) {
+        const primaryRateObj = petRates.find((r: any) => r.pet === primaryName);
+        const secondaryRateObj = petRates.find((r: any) => r.pet === secondaryName);
         const primaryDropRate = primaryRateObj ? Number(primaryRateObj.dropRate) : null;
         const secondaryDropRate = secondaryRateObj ? Number(secondaryRateObj.dropRate) : null;
         const kc1 = Number(primaryKc || 0);
@@ -264,11 +256,11 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
         }
         return '';
       }
-      function quadRateCalc(names: string[], kcs: string[]) {
+      function quadRateCalc(names: string[], kcs: string[], petRates: any) {
         let x = 0;
         let hasAny = false;
         for (let i = 0; i < 4; i++) {
-          const rateObj = petRates.find(r => r.pet === names[i]);
+          const rateObj = petRates.find((r: any) => r.pet === names[i]);
           const dropRate = rateObj ? Number(rateObj.dropRate) : null;
           const kc = Number(kcs[i] || 0);
           if (dropRate && kc > 0) {
@@ -282,23 +274,23 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
         return '';
       }
       if (petName === "Little nightmare") {
-        newLikelihoodValues[petName] = dualRateCalc("Little nightmare", "Phosani", likelihoodKcValues[petName], phosaniKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Little nightmare", "Phosani", likelihoodKcValues[petName], phosaniKcValues[petName], petRates);
       } else if (petName === "Bran") {
-        newLikelihoodValues[petName] = dualRateCalc("Bran", "Bran (Sacrifice)", likelihoodKcValues[petName], branSacrificeKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Bran", "Bran (Sacrifice)", likelihoodKcValues[petName], branSacrificeKcValues[petName], petRates);
       } else if (petName === "Yami") {
-        newLikelihoodValues[petName] = dualRateCalc("Yami", "Yami (Contracts)", likelihoodKcValues[petName], yamiContractsKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Yami", "Yami (Contracts)", likelihoodKcValues[petName], yamiContractsKcValues[petName], petRates);
       } else if (petName === "Nid") {
-        newLikelihoodValues[petName] = dualRateCalc("Nid", "Nid (Destroy)", likelihoodKcValues[petName], nidDestroyKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Nid", "Nid (Destroy)", likelihoodKcValues[petName], nidDestroyKcValues[petName], petRates);
       } else if (petName === "Youngllef") {
-        newLikelihoodValues[petName] = dualRateCalc("Youngllef (Normal Gauntlet)", "Youngllef (Corrupted Gauntlet)", likelihoodKcValues[petName], youngllefCorruptedKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Youngllef (Normal Gauntlet)", "Youngllef (Corrupted Gauntlet)", likelihoodKcValues[petName], youngllefCorruptedKcValues[petName], petRates);
       } else if (petName === "Vet'ion jr. ") {
-        newLikelihoodValues[petName] = dualRateCalc("Vet'ion jr. ", "Vet'ion jr. (Calvar'ion)", likelihoodKcValues[petName], vetionCalvarionKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Vet'ion jr. ", "Vet'ion jr. (Calvar'ion)", likelihoodKcValues[petName], vetionCalvarionKcValues[petName], petRates);
       } else if (petName === "Callisto cub") {
-        newLikelihoodValues[petName] = dualRateCalc("Callisto cub", "Callisto cub (Artio)", likelihoodKcValues[petName], callistoArtioKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Callisto cub", "Callisto cub (Artio)", likelihoodKcValues[petName], callistoArtioKcValues[petName], petRates);
       } else if (petName === "Venenatis spiderling") {
-        newLikelihoodValues[petName] = dualRateCalc("Venenatis spiderling", "Venenatis spiderling (Spindel)", likelihoodKcValues[petName], venenatisSpindelKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Venenatis spiderling", "Venenatis spiderling (Spindel)", likelihoodKcValues[petName], venenatisSpindelKcValues[petName], petRates);
       } else if (petName === "Lil' zik") {
-        newLikelihoodValues[petName] = dualRateCalc("Lil' zik", "Lil' zik (Hard Mode)", likelihoodKcValues[petName], lilZikHardKcValues[petName]);
+        newLikelihoodValues[petName] = dualRateCalc("Lil' zik", "Lil' zik (Hard Mode)", likelihoodKcValues[petName], lilZikHardKcValues[petName], petRates);
       } else if (petName === "Dom") {
         newLikelihoodValues[petName] = quadRateCalc([
           "Dom 6", "Dom 7", "Dom 8", "Dom 8 plus"
@@ -307,7 +299,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
           dom7KcValues[petName],
           dom8KcValues[petName],
           dom8plusKcValues[petName]
-        ]);
+        ], petRates);
       } else {
         const rateObj = petRates.find(r => r.pet === petName);
         const dropRate = rateObj ? Number(rateObj.dropRate) : null;
@@ -321,7 +313,8 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
       }
     });
     setLikelihoodValues(newLikelihoodValues);
-  }, [likelihoodKcValues, phosaniKcValues, branSacrificeKcValues, yamiContractsKcValues, nidDestroyKcValues, youngllefCorruptedKcValues, vetionCalvarionKcValues, callistoArtioKcValues, venenatisSpindelKcValues, lilZikHardKcValues, dom6KcValues, dom7KcValues, dom8KcValues, dom8plusKcValues, accountType, likelihoodMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [likelihoodKcValues, phosaniKcValues, branSacrificeKcValues, yamiContractsKcValues, nidDestroyKcValues, youngllefCorruptedKcValues, vetionCalvarionKcValues, callistoArtioKcValues, venenatisSpindelKcValues, lilZikHardKcValues, dom6KcValues, dom7KcValues, dom8KcValues, dom8plusKcValues, likelihoodMode]);
   // For "Little nightmare": handle Phosani KC input
   const handlePhosaniKcChange = (petName: string, value: string) => {
     setPhosaniKcValues(prevState => ({
@@ -623,19 +616,23 @@ useEffect(() => {
         <Box className={petIconClass} onClick={() => manualMode && handlePetClick(petName)}>
           <img src={petImage} alt={petName} className={detailedMode ? 'detailed-pet-image' : undefined} />
         </Box>
-        {kcMode && petIconClass === 'obtained-pet-icon' && (
+        {kcMode && !isGroup && petIconClass === 'obtained-pet-icon' && (
           <Typography variant="body2" className="kc-mode-text">
             {kcValues[petName]}
           </Typography>
         )}
-        {likelihoodMode && petIconClass === 'obtained-pet-icon' && (() => {
+        {likelihoodMode && !isGroup && petIconClass === 'obtained-pet-icon' && (() => {
+          // Always use the precomputed final rate from likelihoodValues, which accounts for multiple text fields if present
           // Color logic for rateDisplay (copied from grid rendering)
           let rateColor = 'white';
-          const rateObj = petRates.find(r => r.pet === petName);
-          const dropRate = rateObj ? Number(rateObj.dropRate) : null;
-          const kc = Number(likelihoodKcValues[petName] || 0);
-          if (dropRate && kc > 0) {
-            const x = kc / dropRate;
+          // Try to extract the numeric part of the rate for color logic
+          const rateStr = likelihoodValues[petName];
+          let x = null;
+          if (rateStr && rateStr.endsWith('x')) {
+            const num = parseFloat(rateStr);
+            if (!isNaN(num)) x = num;
+          }
+          if (x !== null) {
             if (x < 1.25) rateColor = 'limegreen';
             else if (x < 2) rateColor = 'yellow';
             else if (x < 3) rateColor = 'orange';
@@ -822,7 +819,6 @@ useEffect(() => {
     { main: "7", iron: "50", dropRate: "800", pet: "Youngllef (Corrupted Gauntlet)" },
     { main: "10", iron: "56", dropRate: "2000", pet: "Youngllef (Normal Gauntlet)" },
     { main: "40", iron: "40", dropRate: "2250", pet: "Smolcano" },
-    { main: "430", iron: "10", dropRate: "12000", pet: "Lil' creator" },
     { main: "80", iron: "7.2", dropRate: "8000", pet: "Tiny tempor" },
     { main: "23.5", iron: "9", dropRate: "4100", pet: "Nexling" },
     { main: "39", iron: "6.5", dropRate: "4000", pet: "Abyssal protector" },
@@ -830,7 +826,7 @@ useEffect(() => {
     { main: "3.75", iron: "20", dropRate: "800", pet: "Little nightmare" },
     { main: "7.5", iron: "3", dropRate: "1400", pet: "Phosani" },
     { main: "6", iron: "6", dropRate: "1000", pet: "Bloodhound" },
-    { main: "0", iron: "0", dropRate: "400", pet: "Lil' Creator" },
+    { main: "0", iron: "0", dropRate: "400", pet: "Lil' creator" },
     { main: "30", iron: "25", dropRate: "2500", pet: "Muphin" },
     { main: "21", iron: "21", dropRate: "2000", pet: "Wisp" },
     { main: "37", iron: "33", dropRate: "3000", pet: "Butch" },
@@ -874,6 +870,36 @@ useEffect(() => {
         .reduce((sum, [petName]) => sum + petHoursMap[petName], 0);
     }
     return 0;
+  };
+
+  const dualRateCalc = (primaryName: string, secondaryName: string, primaryKc: string, secondaryKc: string, petRates: any) => {
+    const primaryRateObj = petRates.find((r: any) => r.pet === primaryName);
+    const secondaryRateObj = petRates.find((r: any) => r.pet === secondaryName);
+    const primaryDropRate = primaryRateObj ? Number(primaryRateObj.dropRate) : null;
+    const secondaryDropRate = secondaryRateObj ? Number(secondaryRateObj.dropRate) : null;
+    const kc1 = Number(primaryKc || 0);
+    const kc2 = Number(secondaryKc || 0);
+    let x = 0;
+    if (primaryDropRate && secondaryDropRate && (kc1 > 0 || kc2 > 0)) {
+      x = kc1/primaryDropRate + kc2/secondaryDropRate;
+      return x;
+    }
+    return null;
+  };
+  const quadRateCalc = (names: string[], kcs: string[], petRates: any) => {
+    let x = 0;
+    let hasAny = false;
+    for (let i = 0; i < 4; i++) {
+      const rateObj = petRates.find((r: any) => r.pet === names[i]);
+      const dropRate = rateObj ? Number(rateObj.dropRate) : null;
+      const kc = Number(kcs[i] || 0);
+      if (dropRate && kc > 0) {
+        x += kc / dropRate;
+        hasAny = true;
+      }
+    }
+    if (hasAny) return x;
+    return null;
   };
 
   return (
@@ -1072,7 +1098,7 @@ useEffect(() => {
               )}
             </Grid>
           </Box>
-          {kcMode && (
+          {kcMode && !isGroup && (
             <>
               <Typography variant='h4' sx={{fontWeight: 500, textAlign: 'center'}}>KC Mode{likelihoodMode && ' + Likelihood'}</Typography>
               <Box sx={{display: 'flex', mb: 2, justifyContent: 'space-evenly'}}>
@@ -1116,16 +1142,82 @@ useEffect(() => {
                         };
                         const petImage = detailedMode ? DetailedPet[formatPetName(petName) as keyof typeof DetailedPet] : InvyPet[formatPetName(petName) as keyof typeof InvyPet];
                         // For likelihood mode: get drop rate and calculate x
-                        let rateDisplay = '';
                         let rateColor = 'white';
                         if (likelihoodMode) {
-                          rateDisplay = likelihoodValues[petName] || '';
-                          // For color, recalculate x for color only
-                          const rateObj = petRates.find(r => r.pet === petName);
-                          const dropRate = rateObj ? Number(rateObj.dropRate) : null;
-                          const kc = Number(likelihoodKcValues[petName] || 0);
-                          if (dropRate && kc > 0) {
-                            const x = kc / dropRate;
+                          let x: number | null = null;
+                          if (petName === "Little nightmare") {
+                            x = dualRateCalc("Little nightmare", "Phosani", likelihoodKcValues[petName], phosaniKcValues[petName], petRates);
+                          } else if (petName === "Bran") {
+                            x = dualRateCalc("Bran", "Bran (Sacrifice)", likelihoodKcValues[petName], branSacrificeKcValues[petName], petRates);
+                          } else if (petName === "Yami") {
+                            x = dualRateCalc("Yami", "Yami (Contracts)", likelihoodKcValues[petName], yamiContractsKcValues[petName], petRates);
+                          } else if (petName === "Nid") {
+                            x = dualRateCalc("Nid", "Nid (Destroy)", likelihoodKcValues[petName], nidDestroyKcValues[petName], petRates);
+                          } else if (petName === "Youngllef") {
+                            x = dualRateCalc("Youngllef (Normal Gauntlet)", "Youngllef (Corrupted Gauntlet)", likelihoodKcValues[petName], youngllefCorruptedKcValues[petName], petRates);
+                          } else if (petName === "Vet'ion jr. ") {
+                            x = dualRateCalc("Vet'ion jr. ", "Vet'ion jr. (Calvar'ion)", likelihoodKcValues[petName], vetionCalvarionKcValues[petName], petRates);
+                          } else if (petName === "Callisto cub") {
+                            x = dualRateCalc("Callisto cub", "Callisto cub (Artio)", likelihoodKcValues[petName], callistoArtioKcValues[petName], petRates);
+                          } else if (petName === "Venenatis spiderling") {
+                            x = dualRateCalc("Venenatis spiderling", "Venenatis spiderling (Spindel)", likelihoodKcValues[petName], venenatisSpindelKcValues[petName], petRates);
+                          } else if (petName === "Lil' zik") {
+                            x = dualRateCalc("Lil' zik", "Lil' zik (Hard Mode)", likelihoodKcValues[petName], lilZikHardKcValues[petName], petRates);
+                          } else if (petName === "Dom") {
+                            x = quadRateCalc([
+                              "Dom 6", "Dom 7", "Dom 8", "Dom 8 plus"
+                            ], [
+                              dom6KcValues[petName],
+                              dom7KcValues[petName],
+                              dom8KcValues[petName],
+                              dom8plusKcValues[petName]
+                            ], petRates);
+                          }
+                          if (x !== null) {
+                            if (x < 1.25) rateColor = 'limegreen';
+                            else if (x < 2) rateColor = 'yellow';
+                            else if (x < 3) rateColor = 'orange';
+                            else if (x >= 3) rateColor = 'red';
+                          }
+                        } else {
+                          // KC mode only: color by KC/DropRate for single-rate pets
+                          let x: number | null = null;
+                          if (petName === "Little nightmare") {
+                            x = dualRateCalc("Little nightmare", "Phosani", kcValues[petName], phosaniKcValues[petName], petRates);
+                          } else if (petName === "Bran") {
+                            x = dualRateCalc("Bran", "Bran (Sacrifice)", kcValues[petName], branSacrificeKcValues[petName], petRates);
+                          } else if (petName === "Yami") {
+                            x = dualRateCalc("Yami", "Yami (Contracts)", kcValues[petName], yamiContractsKcValues[petName], petRates);
+                          } else if (petName === "Nid") {
+                            x = dualRateCalc("Nid", "Nid (Destroy)", kcValues[petName], nidDestroyKcValues[petName], petRates);
+                          } else if (petName === "Youngllef") {
+                            x = dualRateCalc("Youngllef (Normal Gauntlet)", "Youngllef (Corrupted Gauntlet)", kcValues[petName], youngllefCorruptedKcValues[petName], petRates);
+                          } else if (petName === "Vet'ion jr. ") {
+                            x = dualRateCalc("Vet'ion jr. ", "Vet'ion jr. (Calvar'ion)", kcValues[petName], vetionCalvarionKcValues[petName], petRates);
+                          } else if (petName === "Callisto cub") {
+                            x = dualRateCalc("Callisto cub", "Callisto cub (Artio)", kcValues[petName], callistoArtioKcValues[petName], petRates);
+                          } else if (petName === "Venenatis spiderling") {
+                            x = dualRateCalc("Venenatis spiderling", "Venenatis spiderling (Spindel)", kcValues[petName], venenatisSpindelKcValues[petName], petRates);
+                          } else if (petName === "Lil' zik") {
+                            x = dualRateCalc("Lil' zik", "Lil' zik (Hard Mode)", kcValues[petName], lilZikHardKcValues[petName], petRates);
+                          } else if (petName === "Dom") {
+                            x = quadRateCalc([
+                              "Dom 6", "Dom 7", "Dom 8", "Dom 8 plus"
+                            ], [
+                              dom6KcValues[petName],
+                              dom7KcValues[petName],
+                              dom8KcValues[petName],
+                              dom8plusKcValues[petName]
+                            ], petRates);
+                          } else {
+                            const rateObj = petRates.find(r => r.pet === petName);
+                            const dropRate = rateObj ? Number(rateObj.dropRate) : null;
+                            const kc = Number(kcValues[petName] || 0);
+                            if (dropRate && kc > 0) {
+                              x = kc / dropRate;
+                            }
+                          }
+                          if (x !== null) {
                             if (x < 1.25) rateColor = 'limegreen';
                             else if (x < 2) rateColor = 'yellow';
                             else if (x < 3) rateColor = 'orange';
@@ -1563,6 +1655,46 @@ useEffect(() => {
                                       placeholder="Purples"
                                     />
                                   </>
+                                ) : petName === "Lil' Creator" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Crates"
+                                    />
+                                  </>
+                                ) : petName === "Rift guardian" || petName === "Beaver" || petName === "Rock golem" || petName === "Baby chinchompa" || petName === "Rocky" || petName === "Tangleroot" || petName === "Heron" || petName === "Giant squirrel" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={"WIP"}
+                                      disabled
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="WIP"
+                                    />
+                                  </>
+                                ) : petName === "Metamorphic Dust" || petName === "Sanguine Dust" || petName === "Akkha" || petName === "Baba" || petName === "Kephri" || petName === "Zebak" || petName === "Warden" ? (
+                                  null
                                 ) : (
                                   <TextField
                                     variant="outlined"
