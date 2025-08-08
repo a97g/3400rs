@@ -76,11 +76,18 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const [callistoArtioKcValues, setCallistoArtioKcValues] = useState<{ [key: string]: string }>({});
   const [venenatisSpindelKcValues, setVenenatisSpindelKcValues] = useState<{ [key: string]: string }>({});
   const [lilZikHardKcValues, setLilZikHardKcValues] = useState<{ [key: string]: string }>({});
+  const [jalNibRekOfftaskKcValues, setJalNibRekOfftaskKcValues] = useState<{ [key: string]: string }>({});
+  const [tzrekJadOfftaskKcValues, setTzrekJadOfftaskKcValues] = useState<{ [key: string]: string }>({});
   // Quad KC for Dom
   const [dom6KcValues, setDom6KcValues] = useState<{ [key: string]: string }>({});
   const [dom7KcValues, setDom7KcValues] = useState<{ [key: string]: string }>({});
   const [dom8KcValues, setDom8KcValues] = useState<{ [key: string]: string }>({});
   const [dom8plusKcValues, setDom8plusKcValues] = useState<{ [key: string]: string }>({});
+    // Quad KC for Tumeken's guardian
+  const [tumeken150KcValues, setTumeken150KcValues] = useState<{ [key: string]: string }>({});
+  const [tumeken300KcValues, setTumeken300KcValues] = useState<{ [key: string]: string }>({});
+  const [tumeken400KcValues, setTumeken400KcValues] = useState<{ [key: string]: string }>({});
+  const [tumeken500KcValues, setTumeken500KcValues] = useState<{ [key: string]: string }>({});
 
   // Handlers for new dual KC inputs
   const handleVetionCalvarionKcChange = (petName: string, value: string) => {
@@ -95,8 +102,12 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   const handleLilZikHardKcChange = (petName: string, value: string) => {
     setLilZikHardKcValues(prev => ({ ...prev, [petName]: value }));
   };
-
-  // Handlers for dual KC inputs
+  const handleJalNibRekOfftaskKcChange = (petName: string, value: string) => {
+    setJalNibRekOfftaskKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleTzrekJadOfftaskKcChange = (petName: string, value: string) => {
+    setTzrekJadOfftaskKcValues(prev => ({ ...prev, [petName]: value }));
+  };
   const handleBranSacrificeKcChange = (petName: string, value: string) => {
     setBranSacrificeKcValues(prev => ({ ...prev, [petName]: value }));
   };
@@ -121,6 +132,18 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
   };
   const handleDom8plusKcChange = (petName: string, value: string) => {
     setDom8plusKcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleTumeken150KcChange = (petName: string, value: string) => {
+    setTumeken150KcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleTumeken300KcChange = (petName: string, value: string) => {
+    setTumeken300KcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleTumeken400KcChange = (petName: string, value: string) => {
+    setTumeken400KcValues(prev => ({ ...prev, [petName]: value }));
+  };
+  const handleTumeken500KcChange = (petName: string, value: string) => {
+    setTumeken500KcValues(prev => ({ ...prev, [petName]: value }));
   };
 
   const [passedPets, setPassedPets] = useState(petCounts);
@@ -291,6 +314,19 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
         newLikelihoodValues[petName] = dualRateCalc("Venenatis spiderling", "Venenatis spiderling (Spindel)", likelihoodKcValues[petName], venenatisSpindelKcValues[petName], petRates);
       } else if (petName === "Lil' zik") {
         newLikelihoodValues[petName] = dualRateCalc("Lil' zik", "Lil' zik (Hard Mode)", likelihoodKcValues[petName], lilZikHardKcValues[petName], petRates);
+      } else if (petName === "Jal-nib-rek") {
+        newLikelihoodValues[petName] = dualRateCalc("Jal-nib-rek", "Jal-nib-rek (Offtask)", likelihoodKcValues[petName], jalNibRekOfftaskKcValues[petName], petRates);
+      } else if (petName === "Tzrek-jad") {
+        newLikelihoodValues[petName] = dualRateCalc("Tzrek-jad", "Tzrek-jad (Offtask)", likelihoodKcValues[petName], tzrekJadOfftaskKcValues[petName], petRates);
+      } else if (petName === "Tumeken's guardian") {
+        newLikelihoodValues[petName] = quadRateCalc([
+          "Tumeken's guardian 150", "Tumeken's guardian 300", "Tumeken's guardian 400", "Tumeken's guardian 500"
+        ], [
+          tumeken150KcValues[petName],
+          tumeken300KcValues[petName],
+          tumeken400KcValues[petName],
+          tumeken500KcValues[petName]
+        ], petRates);
       } else if (petName === "Dom") {
         newLikelihoodValues[petName] = quadRateCalc([
           "Dom 6", "Dom 7", "Dom 8", "Dom 8 plus"
@@ -314,7 +350,7 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
     });
     setLikelihoodValues(newLikelihoodValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [likelihoodKcValues, phosaniKcValues, branSacrificeKcValues, yamiContractsKcValues, nidDestroyKcValues, youngllefCorruptedKcValues, vetionCalvarionKcValues, callistoArtioKcValues, venenatisSpindelKcValues, lilZikHardKcValues, dom6KcValues, dom7KcValues, dom8KcValues, dom8plusKcValues, likelihoodMode]);
+  }, [likelihoodKcValues, tumeken150KcValues, tumeken300KcValues, tumeken400KcValues, tumeken500KcValues, tzrekJadOfftaskKcValues, jalNibRekOfftaskKcValues, phosaniKcValues, branSacrificeKcValues, yamiContractsKcValues, nidDestroyKcValues, youngllefCorruptedKcValues, vetionCalvarionKcValues, callistoArtioKcValues, venenatisSpindelKcValues, lilZikHardKcValues, dom6KcValues, dom7KcValues, dom8KcValues, dom8plusKcValues, likelihoodMode]);
   // For "Little nightmare": handle Phosani KC input
   const handlePhosaniKcChange = (petName: string, value: string) => {
     setPhosaniKcValues(prevState => ({
@@ -362,16 +398,81 @@ export default function PetTable({ totalPets, totalHours, petCounts, transmogs, 
 
 
     // Export likelihoodKcValues (rate input) for obtained pets
-    const likelihoodKcExport: { [key: string]: { [key: string]: string | { ln: string, phosani: string } } } = {};
+  const likelihoodKcExport: { [key: string]: { [key: string]: string | { [key: string]: string } } } = {};
     Object.keys(exportSource).forEach(key => {
       const petCount = exportSource[key];
       const obtainedPets = Object.keys(petCount.pets).filter(petName => petCount.pets[petName] === 1);
-      const kcObj: { [key: string]: string | { ln: string, phosani: string } } = {};
+  const kcObj: { [key: string]: string | { [key: string]: string } } = {};
       obtainedPets.forEach(petName => {
+        // Dual/multi KC pets
         if (petName === "Little nightmare") {
           kcObj[petName] = {
             ln: likelihoodKcValues[petName] || '',
             phosani: phosaniKcValues[petName] || ''
+          };
+        } else if (petName === "Bran") {
+          kcObj[petName] = {
+            bran: likelihoodKcValues[petName] || '',
+            sacrifice: branSacrificeKcValues[petName] || ''
+          };
+        } else if (petName === "Yami") {
+          kcObj[petName] = {
+            yami: likelihoodKcValues[petName] || '',
+            contracts: yamiContractsKcValues[petName] || ''
+          };
+        } else if (petName === "Nid") {
+          kcObj[petName] = {
+            nid: likelihoodKcValues[petName] || '',
+            destroy: nidDestroyKcValues[petName] || ''
+          };
+        } else if (petName === "Youngllef") {
+          kcObj[petName] = {
+            normal: likelihoodKcValues[petName] || '',
+            corrupted: youngllefCorruptedKcValues[petName] || ''
+          };
+        } else if (petName === "Vet'ion jr. ") {
+          kcObj[petName] = {
+            vetion: likelihoodKcValues[petName] || '',
+            calvarion: vetionCalvarionKcValues[petName] || ''
+          };
+        } else if (petName === "Callisto cub") {
+          kcObj[petName] = {
+            callisto: likelihoodKcValues[petName] || '',
+            artio: callistoArtioKcValues[petName] || ''
+          };
+        } else if (petName === "Venenatis spiderling") {
+          kcObj[petName] = {
+            venenatis: likelihoodKcValues[petName] || '',
+            spindel: venenatisSpindelKcValues[petName] || ''
+          };
+        } else if (petName === "Lil' zik") {
+          kcObj[petName] = {
+            zik: likelihoodKcValues[petName] || '',
+            hard: lilZikHardKcValues[petName] || ''
+          };
+        } else if (petName === "Dom") {
+          kcObj[petName] = {
+            dom6: dom6KcValues[petName] || '',
+            dom7: dom7KcValues[petName] || '',
+            dom8: dom8KcValues[petName] || '',
+            dom8plus: dom8plusKcValues[petName] || ''
+          };
+        } else if (petName === "Tumeken's guardian") {
+          kcObj[petName] = {
+            tg150: tumeken150KcValues[petName] || '',
+            tg300: tumeken300KcValues[petName] || '',
+            tg400: tumeken400KcValues[petName] || '',
+            tg500: tumeken500KcValues[petName] || ''
+          };
+        } else if (petName === "Jal-nib-rek") {
+          kcObj[petName] = {
+            main: likelihoodKcValues[petName] || '',
+            offtask: jalNibRekOfftaskKcValues[petName] || ''
+          };
+        } else if (petName === "Tzrek-jad") {
+          kcObj[petName] = {
+            main: likelihoodKcValues[petName] || '',
+            offtask: tzrekJadOfftaskKcValues[petName] || ''
           };
         } else {
           kcObj[petName] = likelihoodKcValues[petName] || '';
@@ -434,23 +535,112 @@ useEffect(() => {
       });
 
 
-      if (importedData.likelihoodKcValues) {
-        const allKc: { [key: string]: string } = {};
-        const allPhosani: { [key: string]: string } = {};
-        Object.values(importedData.likelihoodKcValues).forEach((kcObj: any) => {
-          Object.entries(kcObj).forEach(([petName, kc]) => {
-            if (petName === "Little nightmare" && typeof kc === 'object' && kc !== null) {
-              const kcObj = kc as { ln?: string; phosani?: string };
-              allKc[petName] = kcObj.ln || '';
-              allPhosani[petName] = kcObj.phosani || '';
-            } else {
-              allKc[petName] = kc as string;
-            }
+        if (importedData.likelihoodKcValues) {
+          // Prepare objects for all dual/multi-field pets
+          const allKc: { [key: string]: string } = {};
+          const allPhosani: { [key: string]: string } = {};
+          const allBranSacrifice: { [key: string]: string } = {};
+          const allYamiContracts: { [key: string]: string } = {};
+          const allNidDestroy: { [key: string]: string } = {};
+          const allYoungllefCorrupted: { [key: string]: string } = {};
+          const allVetionCalvarion: { [key: string]: string } = {};
+          const allCallistoArtio: { [key: string]: string } = {};
+          const allVenenatisSpindel: { [key: string]: string } = {};
+          const allLilZikHard: { [key: string]: string } = {};
+          const allJalNibRekOfftask: { [key: string]: string } = {};
+          const allTzrekJadOfftask: { [key: string]: string } = {};
+          const allDom6: { [key: string]: string } = {};
+          const allDom7: { [key: string]: string } = {};
+          const allDom8: { [key: string]: string } = {};
+          const allDom8plus: { [key: string]: string } = {};
+          const allTumeken150: { [key: string]: string } = {};
+          const allTumeken300: { [key: string]: string } = {};
+          const allTumeken400: { [key: string]: string } = {};
+          const allTumeken500: { [key: string]: string } = {};
+          Object.values(importedData.likelihoodKcValues).forEach((kcObj: any) => {
+            Object.entries(kcObj).forEach(([petName, kc]) => {
+              if (petName === "Little nightmare" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.ln || '';
+                allPhosani[petName] = obj.phosani || '';
+              } else if (petName === "Bran" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.bran || '';
+                allBranSacrifice[petName] = obj.sacrifice || '';
+              } else if (petName === "Yami" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.yami || '';
+                allYamiContracts[petName] = obj.contracts || '';
+              } else if (petName === "Nid" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.nid || '';
+                allNidDestroy[petName] = obj.destroy || '';
+              } else if (petName === "Youngllef" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.normal || '';
+                allYoungllefCorrupted[petName] = obj.corrupted || '';
+              } else if (petName === "Vet'ion jr. " && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.vetion || '';
+                allVetionCalvarion[petName] = obj.calvarion || '';
+              } else if (petName === "Callisto cub" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.callisto || '';
+                allCallistoArtio[petName] = obj.artio || '';
+              } else if (petName === "Venenatis spiderling" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.venenatis || '';
+                allVenenatisSpindel[petName] = obj.spindel || '';
+              } else if (petName === "Lil' zik" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.zik || '';
+                allLilZikHard[petName] = obj.hard || '';
+              } else if (petName === "Dom" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allDom6[petName] = obj.dom6 || '';
+                allDom7[petName] = obj.dom7 || '';
+                allDom8[petName] = obj.dom8 || '';
+                allDom8plus[petName] = obj.dom8plus || '';
+              } else if (petName === "Tumeken's guardian" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allTumeken150[petName] = obj.tg150 || '';
+                allTumeken300[petName] = obj.tg300 || '';
+                allTumeken400[petName] = obj.tg400 || '';
+                allTumeken500[petName] = obj.tg500 || '';
+              } else if (petName === "Jal-nib-rek" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.main || '';
+                allJalNibRekOfftask[petName] = obj.offtask || '';
+              } else if (petName === "Tzrek-jad" && typeof kc === 'object' && kc !== null) {
+                const obj = kc as Record<string, string>;
+                allKc[petName] = obj.main || '';
+                allTzrekJadOfftask[petName] = obj.offtask || '';
+              } else {
+                allKc[petName] = kc as string;
+              }
+            });
           });
-        });
-        setLikelihoodKcValues(allKc);
-        setPhosaniKcValues(allPhosani);
-      }
+          setLikelihoodKcValues(allKc);
+          setPhosaniKcValues(allPhosani);
+          setBranSacrificeKcValues(allBranSacrifice);
+          setYamiContractsKcValues(allYamiContracts);
+          setNidDestroyKcValues(allNidDestroy);
+          setYoungllefCorruptedKcValues(allYoungllefCorrupted);
+          setVetionCalvarionKcValues(allVetionCalvarion);
+          setCallistoArtioKcValues(allCallistoArtio);
+          setVenenatisSpindelKcValues(allVenenatisSpindel);
+          setLilZikHardKcValues(allLilZikHard);
+          setDom6KcValues(allDom6);
+          setDom7KcValues(allDom7);
+          setDom8KcValues(allDom8);
+          setDom8plusKcValues(allDom8plus);
+          setTumeken150KcValues(allTumeken150);
+          setTumeken300KcValues(allTumeken300);
+          setTumeken400KcValues(allTumeken400);
+          setTumeken500KcValues(allTumeken500);
+          setJalNibRekOfftaskKcValues(allJalNibRekOfftask);
+          setTzrekJadOfftaskKcValues(allTzrekJadOfftask);
+        }
 
       if (manualMode) {
         const updatedPets: PetData = { ...manualPets.pets };
@@ -822,7 +1012,6 @@ useEffect(() => {
     { main: "80", iron: "7.2", dropRate: "8000", pet: "Tiny tempor" },
     { main: "23.5", iron: "9", dropRate: "4100", pet: "Nexling" },
     { main: "39", iron: "6.5", dropRate: "4000", pet: "Abyssal protector" },
-    { main: "2.5", iron: "2.5", dropRate: "371", pet: "Tumeken's guardian" },
     { main: "3.75", iron: "20", dropRate: "800", pet: "Little nightmare" },
     { main: "7.5", iron: "3", dropRate: "1400", pet: "Phosani" },
     { main: "6", iron: "6", dropRate: "1000", pet: "Bloodhound" },
@@ -848,6 +1037,11 @@ useEffect(() => {
     { main: "0", iron: "0", dropRate: "750", pet: "Dom 7" },
     { main: "0", iron: "0", dropRate: "500", pet: "Dom 8" },
     { main: "0", iron: "0", dropRate: "250", pet: "Dom 8 plus" },
+    { main: "3.1", iron: "3.1", dropRate: "1618", pet: "Tumeken's guardian 150" },
+    { main: "2.6", iron: "2.6", dropRate: "733", pet: "Tumeken's guardian 300" },
+    { main: "2", iron: "2", dropRate: "315", pet: "Tumeken's guardian 400" },
+    { main: "1.3", iron: "1.3", dropRate: "192", pet: "Tumeken's guardian 500" },
+
 
     // { main: "0", iron: "0", dropRate: "1000", pet: "Rift guardian" },
     // { main: "0", iron: "0", dropRate: "750", pet: "Beaver" },
@@ -1536,6 +1730,74 @@ useEffect(() => {
                                       placeholder="Spindel"
                                     />
                                   </>
+                                ) : petName === "Jal-nib-rek" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="On task"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={jalNibRekOfftaskKcValues[petName] || ''}
+                                      onChange={(e) => handleJalNibRekOfftaskKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Offtask + Gamba"
+                                    />
+                                  </>
+                                ) : petName === "Tzrek-jad" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={likelihoodKcValues[petName] || ''}
+                                      onChange={(e) => handleLikelihoodKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="On task"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={tzrekJadOfftaskKcValues[petName] || ''}
+                                      onChange={(e) => handleTzrekJadOfftaskKcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="Offtask + Gamba"
+                                    />
+                                  </>
                                 ) : petName === "Lil' zik" ? (
                                   <>
                                     <TextField
@@ -1634,6 +1896,72 @@ useEffect(() => {
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
                                       placeholder="Wave 8+"
+                                    />
+                                  </>
+                                ) : petName === "Tumeken's guardian" ? (
+                                  <>
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={tumeken150KcValues[petName] || ''}
+                                      onChange={(e) => handleTumeken150KcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="ToA 150"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={tumeken300KcValues[petName] || ''}
+                                      onChange={(e) => handleTumeken300KcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="ToA 300"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={tumeken400KcValues[petName] || ''}
+                                      onChange={(e) => handleTumeken400KcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                        mb: 1,
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="ToA 400"
+                                    />
+                                    <TextField
+                                      variant="outlined"
+                                      size="small"
+                                      value={tumeken500KcValues[petName] || ''}
+                                      onChange={(e) => handleTumeken500KcChange(petName, e.target.value)}
+                                      sx={{
+                                        width: '90%',
+                                        input: { color: 'white', textAlign: 'center' },
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'white !important' },
+                                      }}
+                                      InputProps={{
+                                        style: { color: 'white', textAlign: 'center' },
+                                      }}
+                                      placeholder="ToA 500"
                                     />
                                   </>
                                 ) : petName === "Olmlet" ? (
