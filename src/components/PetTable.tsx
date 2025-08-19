@@ -514,14 +514,85 @@ useEffect(() => {
       const importedData = JSON.parse(storedData);
       // Handle pets
       const petsData = importedData.pets || importedData; // fallback for old format
-      const newKcValues = Object.keys(petsData).reduce((acc, key) => {
+
+      // Flatten KC values for multi-field pets (e.g., Nid, Dom, Tumeken's guardian, etc.)
+      const newKcValues: { [key: string]: string } = {};
+      const newNidDestroy: { [key: string]: string } = {};
+      const newBranSacrifice: { [key: string]: string } = {};
+      const newYamiContracts: { [key: string]: string } = {};
+      const newYoungllefCorrupted: { [key: string]: string } = {};
+      const newVetionCalvarion: { [key: string]: string } = {};
+      const newCallistoArtio: { [key: string]: string } = {};
+      const newVenenatisSpindel: { [key: string]: string } = {};
+      const newLilZikHard: { [key: string]: string } = {};
+      const newDom6: { [key: string]: string } = {};
+      const newDom7: { [key: string]: string } = {};
+      const newDom8: { [key: string]: string } = {};
+      const newDom8plus: { [key: string]: string } = {};
+      const newTumeken150: { [key: string]: string } = {};
+      const newTumeken300: { [key: string]: string } = {};
+      const newTumeken400: { [key: string]: string } = {};
+      const newTumeken500: { [key: string]: string } = {};
+      Object.keys(petsData).forEach(key => {
         const petData = petsData[key];
         Object.keys(petData).forEach(petName => {
-          acc[petName] = petData[petName].toString();
+          const val = petData[petName];
+          if (petName === "Nid" && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.nid || '';
+            newNidDestroy[petName] = val.destroy || '';
+          } else if (petName === "Bran" && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.bran || '';
+            newBranSacrifice[petName] = val.sacrifice || '';
+          } else if (petName === "Yami" && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.yami || '';
+            newYamiContracts[petName] = val.contracts || '';
+          } else if (petName === "Youngllef" && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.normal || '';
+            newYoungllefCorrupted[petName] = val.corrupted || '';
+          } else if (petName === "Vet'ion jr. " && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.vetion || '';
+            newVetionCalvarion[petName] = val.calvarion || '';
+          } else if (petName === "Callisto cub" && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.callisto || '';
+            newCallistoArtio[petName] = val.artio || '';
+          } else if (petName === "Venenatis spiderling" && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.venenatis || '';
+            newVenenatisSpindel[petName] = val.spindel || '';
+          } else if (petName === "Lil' zik" && typeof val === 'object' && val !== null) {
+            newKcValues[petName] = val.zik || '';
+            newLilZikHard[petName] = val.hard || '';
+          } else if (petName === "Dom" && typeof val === 'object' && val !== null) {
+            newDom6[petName] = val.dom6 || '';
+            newDom7[petName] = val.dom7 || '';
+            newDom8[petName] = val.dom8 || '';
+            newDom8plus[petName] = val.dom8plus || '';
+          } else if (petName === "Tumeken's guardian" && typeof val === 'object' && val !== null) {
+            newTumeken150[petName] = val.tg150 || '';
+            newTumeken300[petName] = val.tg300 || '';
+            newTumeken400[petName] = val.tg400 || '';
+            newTumeken500[petName] = val.tg500 || '';
+          } else {
+            newKcValues[petName] = val != null ? val.toString() : '';
+          }
         });
-        return acc;
-      }, {} as { [key: string]: string });
+      });
       setKcValues(newKcValues);
+      setNidDestroyKcValues(newNidDestroy);
+      setBranSacrificeKcValues(newBranSacrifice);
+      setYamiContractsKcValues(newYamiContracts);
+      setYoungllefCorruptedKcValues(newYoungllefCorrupted);
+      setVetionCalvarionKcValues(newVetionCalvarion);
+      setCallistoArtioKcValues(newCallistoArtio);
+      setVenenatisSpindelKcValues(newVenenatisSpindel);
+      setLilZikHardKcValues(newLilZikHard);
+      setDom6KcValues(newDom6);
+      setDom7KcValues(newDom7);
+      setDom8KcValues(newDom8);
+      setDom8plusKcValues(newDom8plus);
+      setTumeken150KcValues(newTumeken150);
+      setTumeken300KcValues(newTumeken300);
+      setTumeken400KcValues(newTumeken400);
+      setTumeken500KcValues(newTumeken500);
 
       setLikelihoodKcValues(prev => {
         const updated = { ...prev };
@@ -698,14 +769,85 @@ useEffect(() => {
         const importedData = JSON.parse(text);
         // Handle pets
         const petsData = importedData.pets || importedData; // fallback for old format
-        const newKcValues = Object.keys(petsData).reduce((acc, key) => {
+
+        // Flatten KC values for multi-field pets (e.g., Nid, Dom, Tumeken's guardian, etc.)
+        const newKcValues: { [key: string]: string } = {};
+        const newNidDestroy: { [key: string]: string } = {};
+        const newBranSacrifice: { [key: string]: string } = {};
+        const newYamiContracts: { [key: string]: string } = {};
+        const newYoungllefCorrupted: { [key: string]: string } = {};
+        const newVetionCalvarion: { [key: string]: string } = {};
+        const newCallistoArtio: { [key: string]: string } = {};
+        const newVenenatisSpindel: { [key: string]: string } = {};
+        const newLilZikHard: { [key: string]: string } = {};
+        const newDom6: { [key: string]: string } = {};
+        const newDom7: { [key: string]: string } = {};
+        const newDom8: { [key: string]: string } = {};
+        const newDom8plus: { [key: string]: string } = {};
+        const newTumeken150: { [key: string]: string } = {};
+        const newTumeken300: { [key: string]: string } = {};
+        const newTumeken400: { [key: string]: string } = {};
+        const newTumeken500: { [key: string]: string } = {};
+        Object.keys(petsData).forEach(key => {
           const petData = petsData[key];
           Object.keys(petData).forEach(petName => {
-            acc[petName] = petData[petName].toString();
+            const val = petData[petName];
+            if (petName === "Nid" && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.nid || '';
+              newNidDestroy[petName] = val.destroy || '';
+            } else if (petName === "Bran" && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.bran || '';
+              newBranSacrifice[petName] = val.sacrifice || '';
+            } else if (petName === "Yami" && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.yami || '';
+              newYamiContracts[petName] = val.contracts || '';
+            } else if (petName === "Youngllef" && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.normal || '';
+              newYoungllefCorrupted[petName] = val.corrupted || '';
+            } else if (petName === "Vet'ion jr. " && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.vetion || '';
+              newVetionCalvarion[petName] = val.calvarion || '';
+            } else if (petName === "Callisto cub" && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.callisto || '';
+              newCallistoArtio[petName] = val.artio || '';
+            } else if (petName === "Venenatis spiderling" && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.venenatis || '';
+              newVenenatisSpindel[petName] = val.spindel || '';
+            } else if (petName === "Lil' zik" && typeof val === 'object' && val !== null) {
+              newKcValues[petName] = val.zik || '';
+              newLilZikHard[petName] = val.hard || '';
+            } else if (petName === "Dom" && typeof val === 'object' && val !== null) {
+              newDom6[petName] = val.dom6 || '';
+              newDom7[petName] = val.dom7 || '';
+              newDom8[petName] = val.dom8 || '';
+              newDom8plus[petName] = val.dom8plus || '';
+            } else if (petName === "Tumeken's guardian" && typeof val === 'object' && val !== null) {
+              newTumeken150[petName] = val.tg150 || '';
+              newTumeken300[petName] = val.tg300 || '';
+              newTumeken400[petName] = val.tg400 || '';
+              newTumeken500[petName] = val.tg500 || '';
+            } else {
+              newKcValues[petName] = val != null ? val.toString() : '';
+            }
           });
-          return acc;
-        }, {} as { [key: string]: string });
+        });
         setKcValues(newKcValues);
+        setNidDestroyKcValues(newNidDestroy);
+        setBranSacrificeKcValues(newBranSacrifice);
+        setYamiContractsKcValues(newYamiContracts);
+        setYoungllefCorruptedKcValues(newYoungllefCorrupted);
+        setVetionCalvarionKcValues(newVetionCalvarion);
+        setCallistoArtioKcValues(newCallistoArtio);
+        setVenenatisSpindelKcValues(newVenenatisSpindel);
+        setLilZikHardKcValues(newLilZikHard);
+        setDom6KcValues(newDom6);
+        setDom7KcValues(newDom7);
+        setDom8KcValues(newDom8);
+        setDom8plusKcValues(newDom8plus);
+        setTumeken150KcValues(newTumeken150);
+        setTumeken300KcValues(newTumeken300);
+        setTumeken400KcValues(newTumeken400);
+        setTumeken500KcValues(newTumeken500);
 
         // If likelihoodKcValues is empty for a pet, set it to sanitized KC value
         setLikelihoodKcValues(prev => {
