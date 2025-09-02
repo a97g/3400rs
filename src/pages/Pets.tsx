@@ -16,6 +16,8 @@ import AsciiGenerator from '../components/AsciiGenerator';
 import { toPng } from 'html-to-image';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
+import DarkVeil from '../components/DarkVeil';
+import GradientText from '../components/GradientText';
 
 export default function Pets() {
   const theme = useTheme();
@@ -362,6 +364,9 @@ export default function Pets() {
 
   return (
     <Page title="3400 Pet List Tools">
+      <div style={{ width: '100%', height: 'calc(100vh - 315px)', position: 'absolute', zIndex: -1, marginTop: '315px'}}>
+        <DarkVeil />
+      </div>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         {/* Responsive nav: Drawer for mobile, sidebar for desktop */}
         {isMobile ? (
@@ -397,13 +402,13 @@ export default function Pets() {
                     onChange={handleToggleChange}
                     sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', backgroundColor: '#141316' }}
                   >
-                    <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                    <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
                       <PersonOutlined />
                     </ToggleButton>
-                    <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                    <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
                       <GroupsOutlined />
                     </ToggleButton>
-                    <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                    <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
                       <TableChartOutlined />
                     </ToggleButton>
                   </ToggleButtonGroup>
@@ -587,6 +592,7 @@ export default function Pets() {
           </>
         ) : (
           <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', minWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
+            {/* HERE HERE HERE */}
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>
               <Box sx={{display:'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mt: 3}}>
               <img src={nav3400rs} alt="icon" className="icon"/>
@@ -599,15 +605,15 @@ export default function Pets() {
                 onChange={handleToggleChange}
                 sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', backgroundColor: '#141316' }}
               >
-                <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
                   <PersonOutlined />
                   {/* Individual RSN */}
                 </ToggleButton>
-                <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
                   <GroupsOutlined />
                   {/* Group / Clan */}
                 </ToggleButton>
-                <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: 'orange' } }}>
+                <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
                   <TableChartOutlined />
                   {/* Ascii Table Generator */}
                 </ToggleButton>
@@ -792,9 +798,15 @@ export default function Pets() {
         <Box sx={{ flexGrow: 1, padding: isMobile ? '0 0.5rem' : '0 !important', boxSizing: 'border-box' }}>
           <Box className="banner-box" sx={{ width: '100%', mt: isMobile ? '56px' : 0, display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
             <Box sx={{ display: 'flex', maxWidth: '700px', alignItems: 'flex-end', pl: isMobile ? 0 : 3 }}>
-              <img src={goldavi} width="125px" height="125px" alt="avi" className="goldavi" />
+              {/* <img src={goldavi} width="125px" height="125px" alt="avi" className="goldavi" /> */}
               <Box>
-                <Typography sx={{ ml: 2, fontWeight: '500' }} variant='h4'>{asciiGen ? 'Ascii' : isGroup ? isLeaderboard ?  'Leaderboard' : 'Group' : 'Individual' }  Pet List Generator</Typography>
+                <GradientText
+                  colors={["#3a09a2", "#4079ff", "#3a09a2", "#4079ff", "#3a09a2"]}
+                  animationSpeed={10}
+                  showBorder={false}
+                >
+                <Typography sx={{ ml: 2,fontWeight: '500' }} variant='h4'>{asciiGen ? 'Ascii' : isGroup ? isLeaderboard ?  'Leaderboard' : 'Group' : 'Individual' }  Pet List Generator</Typography>
+                </GradientText>
                 {!isGroup && !asciiGen && (
                   <Typography sx={{ ml: 2, fontWeight: '300' }} variant='body2'>
                   Enter your RuneScape username and click the magnifying glass.
@@ -826,6 +838,7 @@ export default function Pets() {
                 )}
 
               </Box>
+              <Box sx={{ width: "125px" }} />
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', maxWidth: '300px', pl: isMobile ? 2 : 0, pt: isMobile ? 1 : 0, mr: 1 }}>
@@ -892,7 +905,7 @@ export default function Pets() {
                   onChange={(event) => isGroup ? setGroup(event.target.value) : handleManualModeChange(event)}
                   onKeyPress={handleKeyPress}
                 />
-                <IconButton type="button" sx={{ p: '10px', color: 'orange' }} aria-label="search" onClick={getPetCount}>
+                <IconButton type="button" sx={{ p: '10px', color: '#b8abd2ff' }} aria-label="search" onClick={getPetCount}>
                   <Search />
                 </IconButton>
               </Paper>
