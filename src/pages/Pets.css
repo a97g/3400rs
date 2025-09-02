@@ -129,7 +129,7 @@
 .banner-box {
     height: 300px;
     /* width: '1168px !important'; */
-    /* background-color: '#141316'; */
+    background-color: '#141316';
     /* margin-left: -16px; */
     background-image: linear-gradient(to top, #141316, rgba(24, 24, 24, 0)), url(../resources/background/bg.png);
     background-size: 100%;

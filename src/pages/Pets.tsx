@@ -364,14 +364,14 @@ export default function Pets() {
 
   return (
     <Page title="3400 Pet List Tools">
-      <div style={{ width: '100%', height: 'calc(100vh - 315px)', position: 'absolute', zIndex: -1, marginTop: '315px'}}>
+      <div style={{ width: '100%', height: 'calc(100vh)', position: 'absolute', bottom: 0, zIndex: -1 }}>
         <DarkVeil />
       </div>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>
         {/* Responsive nav: Drawer for mobile, sidebar for desktop */}
         {isMobile ? (
           <>
-            <AppBar position="fixed" sx={{ background: '#1b1a1d', boxShadow: 'none', zIndex: 1301 }}>
+            <AppBar position="fixed" sx={{ background: '#1b1a1d', boxShadow: 'none', zIndex: 1301, height: 'auto'}}>
               <Toolbar sx={{ minHeight: 56, display: 'flex', justifyContent: 'space-between' }}>
                 <IconButton edge="start" color="inherit" aria-label="menu" onClick={() => setDrawerOpen(!drawerOpen)}>
                   <MenuIcon />
@@ -389,7 +389,7 @@ export default function Pets() {
             >
               {/* Spacer to push Drawer content below AppBar */}
               <Toolbar sx={{ minHeight: 56, padding: 0 }} />
-              <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: '100vh', zIndex: 1 }}>
+              <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: '100vh', zIndex: 1  }}>
                 <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>
                   <Box sx={{display:'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mt: 3}}>
                   <img src={nav3400rs} alt="icon" className="icon"/>
@@ -402,13 +402,13 @@ export default function Pets() {
                     onChange={handleToggleChange}
                     sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', backgroundColor: '#141316' }}
                   >
-                    <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
+                    <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                       <PersonOutlined />
                     </ToggleButton>
-                    <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
+                    <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                       <GroupsOutlined />
                     </ToggleButton>
-                    <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
+                    <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                       <TableChartOutlined />
                     </ToggleButton>
                   </ToggleButtonGroup>
@@ -591,7 +591,7 @@ export default function Pets() {
             </Drawer>
           </>
         ) : (
-          <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', minWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
+          <Box sx={{  backgroundColor: '#1b1a1d', maxWidth: '330px', minWidth: '330px', minHeight: '950px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: 'fit-content', borderBottomRightRadius: '10px', borderBottomLeftRadius: '10px', ml: 2, pb: 3, zIndex: 1, borderBottom: '1px solid #2b2f30', borderRight: '1px solid #2b2f30' }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>
               <Box sx={{display:'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mt: 3}}>
               <img src={nav3400rs} alt="icon" className="icon"/>
@@ -604,15 +604,15 @@ export default function Pets() {
                 onChange={handleToggleChange}
                 sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', backgroundColor: '#141316' }}
               >
-                <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
+                <ToggleButton value="individual" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                   <PersonOutlined />
                   {/* Individual RSN */}
                 </ToggleButton>
-                <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
+                <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                   <GroupsOutlined />
                   {/* Group / Clan */}
                 </ToggleButton>
-                <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: '#4c0cc8' } }}>
+                <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                   <TableChartOutlined />
                   {/* Ascii Table Generator */}
                 </ToggleButton>
