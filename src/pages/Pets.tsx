@@ -6,7 +6,7 @@ import nav3400rs from "../resources/nav/nav3400rs.png";
 import axios from 'axios';
 import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, BadgeOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore, StackedLineChartOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
-import goldavi from '../resources/pets/assets/goldavi.png';
+// import goldavi from '../resources/pets/assets/goldavi.png';
 // import Temple from '../resources/pets/assets/temple.svg';
 // import Hiscores from '../resources/pets/assets/hiscores.png';
 import './Pets.css';
@@ -592,7 +592,6 @@ export default function Pets() {
           </>
         ) : (
           <Box sx={{ backgroundColor: '#1b1a1d', maxWidth: '330px', minWidth: '330px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', zIndex: 1 }}>
-            {/* HERE HERE HERE */}
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>
               <Box sx={{display:'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mt: 3}}>
               <img src={nav3400rs} alt="icon" className="icon"/>
