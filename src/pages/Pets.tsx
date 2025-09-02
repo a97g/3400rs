@@ -591,7 +591,7 @@ export default function Pets() {
             </Drawer>
           </>
         ) : (
-          <Box sx={{  backgroundColor: '#1b1a1d', maxWidth: '330px', minWidth: '330px', minHeight: '950px', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: 'fit-content', borderBottomRightRadius: '10px', borderBottomLeftRadius: '10px', ml: 2, pb: 3, zIndex: 1, borderBottom: '1px solid #2b2f30', borderRight: '1px solid #2b2f30' }}>
+          <Box sx={{  backdropFilter: "blur(500px)", maxWidth: '330px', minWidth: '330px', minHeight: 'fit-content', display: 'flex', justifyContent: 'space-between', flexDirection: 'column', height: 'fit-content', borderBottomRightRadius: '10px', pb: 3, zIndex: 1, borderBottom: '1px solid #2b2f30', borderRight: '1px solid #2b2f30' }}>
             <Box sx={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', ml: 3, mr: 3, position: 'sticky', top: 0, zIndex: 1, flexGrow: '0' }}>
               <Box sx={{display:'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mt: 3}}>
               <img src={nav3400rs} alt="icon" className="icon"/>
