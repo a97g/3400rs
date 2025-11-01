@@ -4,7 +4,7 @@ import { Box, Button, Divider, IconButton, InputBase, Paper, Tooltip, Typography
 import Page from '../components/Page';
 import nav3400rs from "../resources/nav/nav3400rs.png";
 import axios from 'axios';
-import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, TableChartOutlined, ContentPasteGoOutlined, BadgeOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore, StackedLineChartOutlined } from '@mui/icons-material';
+import { Help, PersonOutlined, Search, GroupsOutlined, JoinFull, SentimentDissatisfiedOutlined, LeaderboardOutlined, DetailsOutlined, PanToolAltOutlined, ColorLensOutlined, ContentPasteGoOutlined, BadgeOutlined, NumbersOutlined, ContentCopyOutlined, FilterHdrOutlined, KeyOutlined, UploadFileOutlined, MoodBadOutlined, ExpandMore, StackedLineChartOutlined } from '@mui/icons-material';
 import 'react-circular-progressbar/dist/styles.css';
 // import goldavi from '../resources/pets/assets/goldavi.png';
 // import Temple from '../resources/pets/assets/temple.svg';
@@ -408,9 +408,9 @@ export default function Pets() {
                     <ToggleButton value="group" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                       <GroupsOutlined />
                     </ToggleButton>
-                    <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
+                    {/* <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
                       <TableChartOutlined />
-                    </ToggleButton>
+                    </ToggleButton> */}
                   </ToggleButtonGroup>
                   {!asciiGen && (
                     <>
@@ -612,10 +612,10 @@ export default function Pets() {
                   <GroupsOutlined />
                   {/* Group / Clan */}
                 </ToggleButton>
-                <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}>
-                  <TableChartOutlined />
+                {/* <ToggleButton value="ascii" sx={{ flex: 1, color: 'white', '&.Mui-selected': { color: petCountColor } }}> */}
+                  {/* <TableChartOutlined /> */}
                   {/* Ascii Table Generator */}
-                </ToggleButton>
+                {/* </ToggleButton> */}
               </ToggleButtonGroup>
               {!asciiGen && (
                 <>
