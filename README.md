@@ -22,7 +22,7 @@ TypeScript, React, Axios, & Material UI
 
 ## Preview
 
-![3400rs Pet List Preview](https://i.imgur.com/2mCcPTs.png)
+![3400rs Pet List Preview](https://i.imgur.com/CmOwT7g.png)
 ![3400rs Clan Leaderboard Preview](https://i.imgur.com/ys1To0X.png)
 ![3400rs Kc Mode / Likeness Tracker Preview](https://i.imgur.com/soVrlsT.png)
 
