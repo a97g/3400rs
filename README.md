@@ -14,7 +14,6 @@ More or less created for Streamers who hunt pets and do not have any artisic ski
 - Import / Export your Kc's & Pets for ease of updating
 - Manual mode rather than pulling your data from an API
 - View your clans ranking leaderboard
-- **WIP** ASCII Pet list generator
 
 ## Created with
 
