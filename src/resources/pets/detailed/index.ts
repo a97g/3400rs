@@ -70,3 +70,5 @@ export { default as Warden } from './Warden.png';
 export { default as Bran } from './Bran.png';
 export { default as Yami } from './Yami.png';
 export { default as Dom } from './Dom.png';
+export { default as Soup } from './Soup.png';
+export { default as Gull } from './Gull.png';

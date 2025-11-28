@@ -760,7 +760,7 @@ useEffect(() => {
       // Ignore parse errors
     }
   }
-  // eslint-disable-next-line
+   
 }, []);
 
   const handleImportPetData = () => {
@@ -1023,10 +1023,10 @@ useEffect(() => {
 
   const petOrder = [
     "Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte","Bran","Yami",
-    "Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel",
+    "Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel", "Soup",
     "Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling",
     "Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme",
-    "Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid",
+    "Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid", "Gull",
     "Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi",
     "Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit",
     "Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring",
@@ -1103,7 +1103,9 @@ useEffect(() => {
     { petName: "Moxi", hours: 36 },
     { petName: "Bran", hours: 100 },
     { petName: "Yami", hours: 10 },
-    { petName: "Dom", hours: 0 }
+    { petName: "Dom", hours: 0 },
+    { petName: 'Soup', hours: 0},
+    { petName: 'Gull', hours: 0}
   ];
 
   const petRates = [
@@ -1183,6 +1185,8 @@ useEffect(() => {
     { main: "2.6", iron: "2.6", dropRate: "733", pet: "Tumeken's guardian 300" },
     { main: "2", iron: "2", dropRate: "315", pet: "Tumeken's guardian 400" },
     { main: "1.3", iron: "1.3", dropRate: "192", pet: "Tumeken's guardian 500" },
+    { main: "0", iron: "0", dropRate: "3000", pet: "Gull"},
+    { main: "0", iron: "0", dropRate: "0", pet: "Soup"},
 
 
     // { main: "0", iron: "0", dropRate: "1000", pet: "Rift guardian" },
@@ -1370,10 +1374,10 @@ useEffect(() => {
               ) : manualMode && combinedMissing ? (
                 <>
                   {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Bran", "Yami"], manualPets.pets)}
-                  {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], manualPets.pets)}
+                  {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel","Soup"], manualPets.pets)}
                   {renderObtainedPets("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], manualPets.pets)}
                   {renderObtainedPets("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], manualPets.pets)}
-                  {renderObtainedPets("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], manualPets.pets)}
+                  {renderObtainedPets("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid", "Gull"], manualPets.pets)}
                   {renderObtainedPets("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], manualPets.pets)}
                   {renderObtainedPets("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], manualPets.pets)}
                   {renderObtainedPets("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], manualPets.pets)}
@@ -1385,10 +1389,10 @@ useEffect(() => {
               ) : manualMode ? (
                 <>
                   {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Bran", "Yami"], manualPets.pets)}
-                  {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], manualPets.pets)}
+                  {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel","Soup"], manualPets.pets)}
                   {renderPetGrid("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], manualPets.pets)}
                   {renderPetGrid("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], manualPets.pets)}
-                  {renderPetGrid("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], manualPets.pets)}
+                  {renderPetGrid("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid", "Gull"], manualPets.pets)}
                   {renderPetGrid("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], manualPets.pets)}
                   {renderPetGrid("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], manualPets.pets)}
                   {renderPetGrid("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], manualPets.pets)}
@@ -1403,10 +1407,10 @@ useEffect(() => {
               ) : combinedMissing && !manualMode ? (
                 <>
                   {renderObtainedPets("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Bran", "Yami"], petCount.pets)}
-                  {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], petCount.pets)}
+                  {renderObtainedPets("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel","Soup"], petCount.pets)}
                   {renderObtainedPets("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], petCount.pets)}
                   {renderObtainedPets("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], petCount.pets)}
-                  {renderObtainedPets("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], petCount.pets)}
+                  {renderObtainedPets("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid", "Gull"], petCount.pets)}
                   {renderObtainedPets("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], petCount.pets)}
                   {renderObtainedPets("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], petCount.pets)}
                   {renderObtainedPets("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], petCount.pets)}
@@ -1418,10 +1422,10 @@ useEffect(() => {
               ) : (
                 <>
                   {renderPetGrid("Group", ["Baby mole", "Prince black dragon", "Kalphite princess", "Pet dark core", "Sraracha", "Little nightmare", "Scurry", "Huberte", "Bran","Yami"], petCount.pets)}
-                  {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel"], petCount.pets)}
+                  {renderPetGrid("Skilling", ["Rift guardian", "Beaver", "Rock golem", "Baby chinchompa", "Rocky", "Tangleroot", "Heron", "Giant squirrel","Soup"], petCount.pets)}
                   {renderPetGrid("GWD", ["Pet kree'arra", "Pet general graardor", "Pet k'ril tsutsaroth", "Pet zilyana", "Nexling"], petCount.pets)}
                   {renderPetGrid("DKS", ["Pet dagannoth rex", "Pet dagannoth prime", "Pet dagannoth supreme"], petCount.pets)}
-                  {renderPetGrid("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid"], petCount.pets)}
+                  {renderPetGrid("Slayer", ["Pet smoke devil", "Pet kraken", "Hellpuppy", "Abyssal orphan", "Noon", "Ikkle hydra", "Nid", "Gull"], petCount.pets)}
                   {renderPetGrid("Quest", ["Vorki", "Muphin", "Wisp", "Butch", "Baron", "Lil'viathan", "Moxi"], petCount.pets)}
                   {renderPetGrid("PvM Minigame", ["Tzrek-jad", "Jal-nib-rek", "Youngllef", "Lil' creator", "Smol Heredit"], petCount.pets)}
                   {renderPetGrid("Wilderness", ["Pet chaos elemental", "Venenatis spiderling", "Callisto cub", "Vet'ion jr. ", "Scorpia's offspring"], petCount.pets)}
@@ -2144,12 +2148,12 @@ useEffect(() => {
                                       placeholder="Crates"
                                     />
                                   </>
-                                ) : petName === "Rift guardian" || petName === "Beaver" || petName === "Rock golem" || petName === "Baby chinchompa" || petName === "Rocky" || petName === "Tangleroot" || petName === "Heron" || petName === "Giant squirrel" ? (
+                                ) : petName === "Rift guardian" || petName === "Beaver" || petName === "Rock golem" || petName === "Baby chinchompa" || petName === "Rocky" || petName === "Tangleroot" || petName === "Heron" || petName === "Giant squirrel" || petName === "Soup" ? (
                                   <>
                                     <TextField
                                       variant="outlined"
                                       size="small"
-                                      value={"WIP"}
+                                      value={"NA"}
                                       disabled
                                       sx={{
                                         width: '90%',
@@ -2160,7 +2164,7 @@ useEffect(() => {
                                       InputProps={{
                                         style: { color: 'white', textAlign: 'center' },
                                       }}
-                                      placeholder="WIP"
+                                      placeholder="NA"
                                     />
                                   </>
                                 ) : petName === "Metamorphic Dust" || petName === "Sanguine Dust" || petName === "Akkha" || petName === "Baba" || petName === "Kephri" || petName === "Zebak" || petName === "Warden" ? (

@@ -23,8 +23,8 @@ export default function Pets() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const totalPets = 65;
-  const totalHours = 5370;
+  const totalPets = 67;
+  const totalHours = 5493;
 
   const [group, setGroup] = useState('2394');
   const [player, setPlayer] = useState('3400');
