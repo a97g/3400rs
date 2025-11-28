@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, RefObject } from 'react';
 import { Box, Typography, TextField, Button, useMediaQuery, useTheme, Fade, Collapse } from '@mui/material';
 import Grid from '@mui/material/Grid2';
@@ -760,7 +761,6 @@ useEffect(() => {
       // Ignore parse errors
     }
   }
-   
 }, []);
 
   const handleImportPetData = () => {
