@@ -1,4 +1,4 @@
-export async function onRequest(context: { request: Request }) {
+export function onRequest(context: { request: Request }) {
   const { request } = context;
 
   if (request.method === "OPTIONS") {
@@ -67,27 +67,27 @@ export async function onRequest(context: { request: Request }) {
     });
   }
 
-  const upstreamResponse = await fetch(targetUrl.toString(), {
+  return fetch(targetUrl.toString(), {
     method: request.method,
     headers: {
       "User-Agent": "3400rs-proxy",
     },
-  });
+  }).then((upstreamResponse) => {
+    const responseHeaders = new Headers();
+    const contentType = upstreamResponse.headers.get("content-type");
 
-  const responseHeaders = new Headers();
-  const contentType = upstreamResponse.headers.get("content-type");
+    if (contentType) {
+      responseHeaders.set("content-type", contentType);
+    }
 
-  if (contentType) {
-    responseHeaders.set("content-type", contentType);
-  }
+    responseHeaders.set("Access-Control-Allow-Origin", "*");
+    responseHeaders.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+    responseHeaders.set("Access-Control-Allow-Headers", "*");
 
-  responseHeaders.set("Access-Control-Allow-Origin", "*");
-  responseHeaders.set("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
-  responseHeaders.set("Access-Control-Allow-Headers", "*");
-
-  return new Response(upstreamResponse.body, {
-    status: upstreamResponse.status,
-    statusText: upstreamResponse.statusText,
-    headers: responseHeaders,
+    return new Response(upstreamResponse.body, {
+      status: upstreamResponse.status,
+      statusText: upstreamResponse.statusText,
+      headers: responseHeaders,
+    });
   });
 }
