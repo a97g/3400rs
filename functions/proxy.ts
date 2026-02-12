@@ -1,5 +1,5 @@
 export function onRequest(context: { request: Request }) {
-  var request = context.request;
+  const request = context.request;
 
   if (request.method === "OPTIONS") {
     return new Response(null, {
@@ -21,8 +21,8 @@ export function onRequest(context: { request: Request }) {
     });
   }
 
-  var requestUrl = new URL(request.url);
-  var target = requestUrl.searchParams.get("url");
+  const requestUrl = new URL(request.url);
+  const target = requestUrl.searchParams.get("url");
 
   if (!target) {
     return new Response("Missing url query parameter", {
@@ -33,7 +33,7 @@ export function onRequest(context: { request: Request }) {
     });
   }
 
-  var targetUrl: URL;
+  let targetUrl: URL;
   try {
     targetUrl = new URL(target);
   } catch {
@@ -54,8 +54,8 @@ export function onRequest(context: { request: Request }) {
     });
   }
 
-  var hostname = targetUrl.hostname.toLowerCase();
-  var isAllowedHost =
+  const hostname = targetUrl.hostname.toLowerCase();
+  const isAllowedHost =
     hostname === "templeosrs.com" || hostname.endsWith(".templeosrs.com");
 
   if (!isAllowedHost) {
@@ -73,8 +73,8 @@ export function onRequest(context: { request: Request }) {
       "User-Agent": "3400rs-proxy",
     },
   }).then(function (upstreamResponse) {
-    var responseHeaders = new Headers();
-    var contentType = upstreamResponse.headers.get("content-type");
+    const responseHeaders = new Headers();
+    const contentType = upstreamResponse.headers.get("content-type");
 
     if (contentType) {
       responseHeaders.set("content-type", contentType);
