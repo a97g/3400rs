@@ -229,7 +229,7 @@ export default function Pets() {
             20659, 20661, 20663, 20665, 21509, 13071, 23495, 23760, 23757,
             24491, 25348, 25602, 26348, 26901, 27352, 27590, 28246, 28250,
             28248, 28252, 28801, 28960, 28962, 29836, 30152, 30154, 30622,
-            30888, 31130,
+            30888, 31130, 31285, 31283, 33124,
           ];
           const petOrder = [
             "Abyssal orphan",
@@ -297,6 +297,9 @@ export default function Pets() {
             "Bran",
             "Yami",
             "Dom",
+            "Gull",
+            "Soup",
+            "Beef",
           ];
           const idToPetName: { [id: number]: string } = {};
           petIdOrder.forEach((id, idx) => {
