@@ -20,6 +20,14 @@ import bronzeTrophy from "../resources/pets/assets/bronzeped.png";
 import otherTrophy from "../resources/pets/assets/otherped.png";
 import DefaultIcon from "../resources/pets/assets/chat.png";
 import axios from "axios";
+import {
+  DUST_PETS,
+  NON_MAIN_PETS,
+  PET_DISPLAY_SECTIONS,
+  PET_HOURS_BY_NAME,
+  PET_ORDER,
+  TOA_TRANSMOG_PETS,
+} from "../resources/pets/petMeta";
 
 interface PetData {
   [key: string]: number;
@@ -309,23 +317,14 @@ export default function PetTable({
   };
 
   const handlePetClick = (petName: string) => {
-    const excludedPets = [
-      "Metamorphic Dust",
-      "Sanguine Dust",
-      "Akkha",
-      "Baba",
-      "Kephri",
-      "Zebak",
-      "Warden",
-    ];
+    const excludedPets = NON_MAIN_PETS as readonly string[];
     setManualPets((prevState) => {
       const isExcluded = excludedPets.includes(petName);
       const newPetCount = isExcluded
         ? prevState.pet_count
         : Object.values(prevState.pets).filter((count) => count === 1).length +
           (prevState.pets[petName] ? -1 : 1);
-      const petHoursEntry = petHours.find((pet) => pet.petName === petName);
-      const newPetHours = petHoursEntry ? petHoursEntry.hours : 0;
+      const newPetHours = PET_HOURS_BY_NAME[petName] ?? 0;
       const totalPetHours = isExcluded
         ? prevState.pet_hours
         : prevState.pet_hours +
@@ -1422,6 +1421,15 @@ export default function PetTable({
     return renderPetGrid(category, obtainedPets, pets);
   };
 
+  const renderMainPetSections = (
+    renderer: (category: string, petNames: string[], pets: PetData) => JSX.Element | null,
+    pets: PetData,
+  ) => {
+    return PET_DISPLAY_SECTIONS.map((section) =>
+      renderer(section.label, [...section.petNames], pets),
+    );
+  };
+
   const getTrophyImage = (rank: number) => {
     if (rank === 1) return goldTrophy;
     if (rank === 2) return silverTrophy;
@@ -1429,155 +1437,7 @@ export default function PetTable({
     return null;
   };
 
-  const petOrder = [
-    "Baby mole",
-    "Prince black dragon",
-    "Kalphite princess",
-    "Pet dark core",
-    "Sraracha",
-    "Little nightmare",
-    "Scurry",
-    "Huberte",
-    "Bran",
-    "Yami",
-    "Rift guardian",
-    "Beaver",
-    "Rock golem",
-    "Baby chinchompa",
-    "Rocky",
-    "Tangleroot",
-    "Heron",
-    "Giant squirrel",
-    "Soup",
-    "Pet kree'arra",
-    "Pet general graardor",
-    "Pet k'ril tsutsaroth",
-    "Pet zilyana",
-    "Nexling",
-    "Pet dagannoth rex",
-    "Pet dagannoth prime",
-    "Pet dagannoth supreme",
-    "Pet smoke devil",
-    "Pet kraken",
-    "Hellpuppy",
-    "Abyssal orphan",
-    "Noon",
-    "Ikkle hydra",
-    "Nid",
-    "Gull",
-    "Vorki",
-    "Muphin",
-    "Wisp",
-    "Butch",
-    "Baron",
-    "Lil'viathan",
-    "Moxi",
-    "Beef",
-    "Tzrek-jad",
-    "Jal-nib-rek",
-    "Youngllef",
-    "Lil' creator",
-    "Smol Heredit",
-    "Pet chaos elemental",
-    "Venenatis spiderling",
-    "Callisto cub",
-    "Vet'ion jr. ",
-    "Scorpia's offspring",
-    "Olmlet",
-    "Lil' zik",
-    "Tumeken's guardian",
-    "Pet penance queen",
-    "Phoenix",
-    "Smolcano",
-    "Tiny tempor",
-    "Abyssal protector",
-    "Pet snakeling",
-    "Chompy chick",
-    "Skotos",
-    "Herbi",
-    "Bloodhound",
-    "Quetzin",
-    "Dom",
-    "Metamorphic Dust",
-    "Sanguine Dust",
-    "Akkha",
-    "Baba",
-    "Kephri",
-    "Zebak",
-    "Warden",
-  ];
-
-  //something off here
-  const petHours = [
-    { petName: "Pet chaos elemental", hours: 3 },
-    { petName: "Pet dagannoth supreme", hours: 57 },
-    { petName: "Pet dagannoth prime", hours: 57 },
-    { petName: "Pet dagannoth rex", hours: 57 },
-    { petName: "Pet penance queen", hours: 308 },
-    { petName: "Pet kree'arra", hours: 100 },
-    { petName: "Pet general graardor", hours: 91 },
-    { petName: "Pet k'ril tsutsaroth", hours: 77 },
-    { petName: "Pet zilyana", hours: 77 },
-    { petName: "Baby mole", hours: 33 },
-    { petName: "Prince black dragon", hours: 25 },
-    { petName: "Kalphite princess", hours: 60 },
-    { petName: "Pet smoke devil", hours: 27 },
-    { petName: "Pet kraken", hours: 30 },
-    { petName: "Pet dark core", hours: 77 },
-    { petName: "Pet snakeling", hours: 91 },
-    { petName: "Chompy chick", hours: 2 },
-    { petName: "Venenatis spiderling", hours: 51 },
-    { petName: "Callisto cub", hours: 43 },
-    { petName: "Vet'ion jr.", hours: 51 },
-    { petName: "Scorpia's offspring", hours: 16 },
-    { petName: "Tzrek-jad", hours: 27 },
-    { petName: "Hellpuppy", hours: 46 },
-    { petName: "Abyssal orphan", hours: 57 },
-    { petName: "Phoenix", hours: 100 },
-    { petName: "Olmlet", hours: 403 },
-    { petName: "Skotos", hours: 65 },
-    { petName: "Jal-nib-rek", hours: 43 },
-    { petName: "Noon", hours: 83 },
-    { petName: "Vorki", hours: 88 },
-    { petName: "Ikkle hydra", hours: 100 },
-    { petName: "Sraracha", hours: 30 },
-    { petName: "Youngllef", hours: 114 },
-    { petName: "Smolcano", hours: 56 },
-    { petName: "Lil' creator", hours: 28 },
-    { petName: "Rift guardian", hours: 68 },
-    { petName: "Beaver", hours: 111 },
-    { petName: "Rock golem", hours: 118 },
-    { petName: "Baby chinchompa", hours: 99 },
-    { petName: "Rocky", hours: 18 },
-    { petName: "Tangleroot", hours: 82 },
-    { petName: "Heron", hours: 84 },
-    { petName: "Giant squirrel", hours: 133 },
-    { petName: "Herbi", hours: 96 },
-    { petName: "Bloodhound", hours: 286 },
-    { petName: "Tiny tempor", hours: 100 },
-    { petName: "Lil' zik", hours: 179 },
-    { petName: "Little nightmare", hours: 187 },
-    { petName: "Nexling", hours: 174 },
-    { petName: "Abyssal protector", hours: 103 },
-    { petName: "Tumeken's guardian", hours: 148 },
-    { petName: "Muphin", hours: 83 },
-    { petName: "Wisp", hours: 95 },
-    { petName: "Butch", hours: 81 },
-    { petName: "Baron", hours: 83 },
-    { petName: "Lil'viathan", hours: 83 },
-    { petName: "Scurry", hours: 50 },
-    { petName: "Smol Heredit", hours: 40 },
-    { petName: "Quetzin", hours: 42 },
-    { petName: "Nid", hours: 33 },
-    { petName: "Huberte", hours: 47 },
-    { petName: "Moxi", hours: 36 },
-    { petName: "Bran", hours: 100 },
-    { petName: "Yami", hours: 10 },
-    { petName: "Dom", hours: 0 },
-    { petName: "Soup", hours: 0 },
-    { petName: "Gull", hours: 0 },
-    { petName: "Beef", hours: 0 },
-  ];
+  const petOrder = [...PET_ORDER, ...DUST_PETS, ...TOA_TRANSMOG_PETS];
 
   const petRates = [
     { main: "100", iron: "48", dropRate: "300", pet: "Pet chaos elemental" },
@@ -2091,280 +1951,18 @@ export default function PetTable({
                     renderMissingPets(manualPets.pets)
                   ) : manualMode && combinedMissing ? (
                     <>
-                      {renderObtainedPets(
-                        "Group",
-                        [
-                          "Baby mole",
-                          "Prince black dragon",
-                          "Kalphite princess",
-                          "Pet dark core",
-                          "Sraracha",
-                          "Little nightmare",
-                          "Scurry",
-                          "Huberte",
-                          "Bran",
-                          "Yami",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Skilling",
-                        [
-                          "Rift guardian",
-                          "Beaver",
-                          "Rock golem",
-                          "Baby chinchompa",
-                          "Rocky",
-                          "Tangleroot",
-                          "Heron",
-                          "Giant squirrel",
-                          "Soup",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "GWD",
-                        [
-                          "Pet kree'arra",
-                          "Pet general graardor",
-                          "Pet k'ril tsutsaroth",
-                          "Pet zilyana",
-                          "Nexling",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "DKS",
-                        [
-                          "Pet dagannoth rex",
-                          "Pet dagannoth prime",
-                          "Pet dagannoth supreme",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Slayer",
-                        [
-                          "Pet smoke devil",
-                          "Pet kraken",
-                          "Hellpuppy",
-                          "Abyssal orphan",
-                          "Noon",
-                          "Ikkle hydra",
-                          "Nid",
-                          "Gull",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Quest",
-                        [
-                          "Vorki",
-                          "Muphin",
-                          "Wisp",
-                          "Butch",
-                          "Baron",
-                          "Lil'viathan",
-                          "Moxi",
-                          "Beef",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "PvM Minigame",
-                        [
-                          "Tzrek-jad",
-                          "Jal-nib-rek",
-                          "Youngllef",
-                          "Lil' creator",
-                          "Smol Heredit",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Wilderness",
-                        [
-                          "Pet chaos elemental",
-                          "Venenatis spiderling",
-                          "Callisto cub",
-                          "Vet'ion jr. ",
-                          "Scorpia's offspring",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Raids",
-                        ["Olmlet", "Lil' zik", "Tumeken's guardian"],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Skilling Minigames",
-                        [
-                          "Pet penance queen",
-                          "Phoenix",
-                          "Smolcano",
-                          "Tiny tempor",
-                          "Abyssal protector",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Miscellaneous",
-                        [
-                          "Pet snakeling",
-                          "Chompy chick",
-                          "Skotos",
-                          "Herbi",
-                          "Bloodhound",
-                          "Quetzin",
-                          "Dom",
-                        ],
-                        manualPets.pets,
-                      )}
+                      {renderMainPetSections(renderObtainedPets, manualPets.pets)}
                       {renderMissingPets(manualPets.pets)}
                     </>
                   ) : manualMode ? (
                     <>
-                      {renderPetGrid(
-                        "Group",
-                        [
-                          "Baby mole",
-                          "Prince black dragon",
-                          "Kalphite princess",
-                          "Pet dark core",
-                          "Sraracha",
-                          "Little nightmare",
-                          "Scurry",
-                          "Huberte",
-                          "Bran",
-                          "Yami",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "Skilling",
-                        [
-                          "Rift guardian",
-                          "Beaver",
-                          "Rock golem",
-                          "Baby chinchompa",
-                          "Rocky",
-                          "Tangleroot",
-                          "Heron",
-                          "Giant squirrel",
-                          "Soup",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "GWD",
-                        [
-                          "Pet kree'arra",
-                          "Pet general graardor",
-                          "Pet k'ril tsutsaroth",
-                          "Pet zilyana",
-                          "Nexling",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "DKS",
-                        [
-                          "Pet dagannoth rex",
-                          "Pet dagannoth prime",
-                          "Pet dagannoth supreme",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "Slayer",
-                        [
-                          "Pet smoke devil",
-                          "Pet kraken",
-                          "Hellpuppy",
-                          "Abyssal orphan",
-                          "Noon",
-                          "Ikkle hydra",
-                          "Nid",
-                          "Gull",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "Quest",
-                        [
-                          "Vorki",
-                          "Muphin",
-                          "Wisp",
-                          "Butch",
-                          "Baron",
-                          "Lil'viathan",
-                          "Moxi",
-                          "Beef",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "PvM Minigame",
-                        [
-                          "Tzrek-jad",
-                          "Jal-nib-rek",
-                          "Youngllef",
-                          "Lil' creator",
-                          "Smol Heredit",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "Wilderness",
-                        [
-                          "Pet chaos elemental",
-                          "Venenatis spiderling",
-                          "Callisto cub",
-                          "Vet'ion jr. ",
-                          "Scorpia's offspring",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "Raids",
-                        ["Olmlet", "Lil' zik", "Tumeken's guardian"],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "Skilling Minigames",
-                        [
-                          "Pet penance queen",
-                          "Phoenix",
-                          "Smolcano",
-                          "Tiny tempor",
-                          "Abyssal protector",
-                        ],
-                        manualPets.pets,
-                      )}
-                      {renderPetGrid(
-                        "Miscellaneous",
-                        [
-                          "Pet snakeling",
-                          "Chompy chick",
-                          "Skotos",
-                          "Herbi",
-                          "Bloodhound",
-                          "Quetzin",
-                          "Dom",
-                        ],
-                        manualPets.pets,
-                      )}
+                      {renderMainPetSections(renderPetGrid, manualPets.pets)}
                       {showDusts &&
-                        renderPetGrid(
-                          "Dusts",
-                          ["Metamorphic Dust", "Sanguine Dust"],
-                          petCount.pets,
-                        )}
+                        renderPetGrid("Dusts", [...DUST_PETS], petCount.pets)}
                       {showToa &&
                         renderPetGrid(
                           "Toa Transmogs",
-                          ["Akkha", "Baba", "Kephri", "Zebak", "Warden"],
+                          [...TOA_TRANSMOG_PETS],
                           petCount.pets,
                         )}
                     </>
@@ -2372,280 +1970,18 @@ export default function PetTable({
                     renderMissingPets(petCount.pets)
                   ) : combinedMissing && !manualMode ? (
                     <>
-                      {renderObtainedPets(
-                        "Group",
-                        [
-                          "Baby mole",
-                          "Prince black dragon",
-                          "Kalphite princess",
-                          "Pet dark core",
-                          "Sraracha",
-                          "Little nightmare",
-                          "Scurry",
-                          "Huberte",
-                          "Bran",
-                          "Yami",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Skilling",
-                        [
-                          "Rift guardian",
-                          "Beaver",
-                          "Rock golem",
-                          "Baby chinchompa",
-                          "Rocky",
-                          "Tangleroot",
-                          "Heron",
-                          "Giant squirrel",
-                          "Soup",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "GWD",
-                        [
-                          "Pet kree'arra",
-                          "Pet general graardor",
-                          "Pet k'ril tsutsaroth",
-                          "Pet zilyana",
-                          "Nexling",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "DKS",
-                        [
-                          "Pet dagannoth rex",
-                          "Pet dagannoth prime",
-                          "Pet dagannoth supreme",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Slayer",
-                        [
-                          "Pet smoke devil",
-                          "Pet kraken",
-                          "Hellpuppy",
-                          "Abyssal orphan",
-                          "Noon",
-                          "Ikkle hydra",
-                          "Nid",
-                          "Gull",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Quest",
-                        [
-                          "Vorki",
-                          "Muphin",
-                          "Wisp",
-                          "Butch",
-                          "Baron",
-                          "Lil'viathan",
-                          "Moxi",
-                          "Beef",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "PvM Minigame",
-                        [
-                          "Tzrek-jad",
-                          "Jal-nib-rek",
-                          "Youngllef",
-                          "Lil' creator",
-                          "Smol Heredit",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Wilderness",
-                        [
-                          "Pet chaos elemental",
-                          "Venenatis spiderling",
-                          "Callisto cub",
-                          "Vet'ion jr. ",
-                          "Scorpia's offspring",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Raids",
-                        ["Olmlet", "Lil' zik", "Tumeken's guardian"],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Skilling Minigames",
-                        [
-                          "Pet penance queen",
-                          "Phoenix",
-                          "Smolcano",
-                          "Tiny tempor",
-                          "Abyssal protector",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderObtainedPets(
-                        "Miscellaneous",
-                        [
-                          "Pet snakeling",
-                          "Chompy chick",
-                          "Skotos",
-                          "Herbi",
-                          "Bloodhound",
-                          "Quetzin",
-                          "Dom",
-                        ],
-                        petCount.pets,
-                      )}
+                      {renderMainPetSections(renderObtainedPets, petCount.pets)}
                       {renderMissingPets(petCount.pets)}
                     </>
                   ) : (
                     <>
-                      {renderPetGrid(
-                        "Group",
-                        [
-                          "Baby mole",
-                          "Prince black dragon",
-                          "Kalphite princess",
-                          "Pet dark core",
-                          "Sraracha",
-                          "Little nightmare",
-                          "Scurry",
-                          "Huberte",
-                          "Bran",
-                          "Yami",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "Skilling",
-                        [
-                          "Rift guardian",
-                          "Beaver",
-                          "Rock golem",
-                          "Baby chinchompa",
-                          "Rocky",
-                          "Tangleroot",
-                          "Heron",
-                          "Giant squirrel",
-                          "Soup",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "GWD",
-                        [
-                          "Pet kree'arra",
-                          "Pet general graardor",
-                          "Pet k'ril tsutsaroth",
-                          "Pet zilyana",
-                          "Nexling",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "DKS",
-                        [
-                          "Pet dagannoth rex",
-                          "Pet dagannoth prime",
-                          "Pet dagannoth supreme",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "Slayer",
-                        [
-                          "Pet smoke devil",
-                          "Pet kraken",
-                          "Hellpuppy",
-                          "Abyssal orphan",
-                          "Noon",
-                          "Ikkle hydra",
-                          "Nid",
-                          "Gull",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "Quest",
-                        [
-                          "Vorki",
-                          "Muphin",
-                          "Wisp",
-                          "Butch",
-                          "Baron",
-                          "Lil'viathan",
-                          "Moxi",
-                          "Beef",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "PvM Minigame",
-                        [
-                          "Tzrek-jad",
-                          "Jal-nib-rek",
-                          "Youngllef",
-                          "Lil' creator",
-                          "Smol Heredit",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "Wilderness",
-                        [
-                          "Pet chaos elemental",
-                          "Venenatis spiderling",
-                          "Callisto cub",
-                          "Vet'ion jr. ",
-                          "Scorpia's offspring",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "Raids",
-                        ["Olmlet", "Lil' zik", "Tumeken's guardian"],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "Skilling Minigames",
-                        [
-                          "Pet penance queen",
-                          "Phoenix",
-                          "Smolcano",
-                          "Tiny tempor",
-                          "Abyssal protector",
-                        ],
-                        petCount.pets,
-                      )}
-                      {renderPetGrid(
-                        "Miscellaneous",
-                        [
-                          "Pet snakeling",
-                          "Chompy chick",
-                          "Skotos",
-                          "Herbi",
-                          "Bloodhound",
-                          "Quetzin",
-                          "Dom",
-                        ],
-                        petCount.pets,
-                      )}
+                      {renderMainPetSections(renderPetGrid, petCount.pets)}
                       {showDusts &&
-                        renderPetGrid(
-                          "Dusts",
-                          ["Metamorphic Dust", "Sanguine Dust"],
-                          petCount.pets,
-                        )}
+                        renderPetGrid("Dusts", [...DUST_PETS], petCount.pets)}
                       {showToa &&
                         renderPetGrid(
                           "Toa Transmogs",
-                          ["Akkha", "Baba", "Kephri", "Zebak", "Warden"],
+                          [...TOA_TRANSMOG_PETS],
                           petCount.pets,
                         )}
                     </>
@@ -4209,13 +3545,9 @@ export default function PetTable({
                                             placeholder="NA"
                                           />
                                         </>
-                                      ) : petName === "Metamorphic Dust" ||
-                                        petName === "Sanguine Dust" ||
-                                        petName === "Akkha" ||
-                                        petName === "Baba" ||
-                                        petName === "Kephri" ||
-                                        petName === "Zebak" ||
-                                        petName === "Warden" ? null : (
+                                      ) : NON_MAIN_PETS.includes(
+                                          petName as (typeof NON_MAIN_PETS)[number],
+                                        ) ? null : (
                                         <TextField
                                           variant="outlined"
                                           size="small"

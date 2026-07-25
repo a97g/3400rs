@@ -65,13 +65,19 @@ import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import DarkVeil from "../components/DarkVeil";
 import GradientText from "../components/GradientText";
+import {
+  PET_ID_TO_NAME,
+  PET_ORDER,
+  TOTAL_PET_HOURS,
+  TOTAL_PETS,
+} from "../resources/pets/petMeta";
 
 export default function Pets() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  const totalPets = 68;
-  const totalHours = 5493;
+  const totalPets = TOTAL_PETS;
+  const totalHours = TOTAL_PET_HOURS;
 
   const [group, setGroup] = useState("2394");
   const [player, setPlayer] = useState("3400");
@@ -220,101 +226,15 @@ export default function Pets() {
           const tob = data.items?.theatre_of_blood || [];
           const toa = data.items?.tombs_of_amascut || [];
 
-          // Correct petIdOrder to match the provided order
-          const petIdOrder = [
-            13262, 22746, 13178, 13247, 11995, 12651, 12816, 12644, 12643,
-            12645, 13225, 12650, 12646, 21748, 21291, 12647, 12653, 12655,
-            12649, 12652, 13181, 21273, 12648, 13177, 13179, 21992, 20693,
-            12921, 20851, 22473, 19730, 12703, 13320, 13321, 13322, 13324,
-            20659, 20661, 20663, 20665, 21509, 13071, 23495, 23760, 23757,
-            24491, 25348, 25602, 26348, 26901, 27352, 27590, 28246, 28250,
-            28248, 28252, 28801, 28960, 28962, 29836, 30152, 30154, 30622,
-            30888, 31130, 31285, 31283, 33124,
-          ];
-          const petOrder = [
-            "Abyssal orphan",
-            "Ikkle hydra",
-            "Callisto cub",
-            "Hellpuppy",
-            "Pet chaos elemental",
-            "Pet zilyana",
-            "Pet dark core",
-            "Pet dagannoth prime",
-            "Pet dagannoth supreme",
-            "Pet dagannoth rex",
-            "Tzrek-jad",
-            "Pet general graardor",
-            "Baby mole",
-            "Noon",
-            "Jal-nib-rek",
-            "Kalphite princess",
-            "Prince black dragon",
-            "Pet kraken",
-            "Pet kree'arra",
-            "Pet k'ril tsutsaroth",
-            "Scorpia's offspring",
-            "Skotos",
-            "Pet smoke devil",
-            "Venenatis spiderling",
-            "Vet'ion jr. ",
-            "Vorki",
-            "Phoenix",
-            "Pet snakeling",
-            "Olmlet",
-            "Lil' zik",
-            "Bloodhound",
-            "Pet penance queen",
-            "Heron",
-            "Rock golem",
-            "Beaver",
-            "Baby chinchompa",
-            "Giant squirrel",
-            "Tangleroot",
-            "Rocky",
-            "Rift guardian",
-            "Herbi",
-            "Chompy chick",
-            "Sraracha",
-            "Smolcano",
-            "Youngllef",
-            "Little nightmare",
-            "Lil' creator",
-            "Tiny tempor",
-            "Nexling",
-            "Abyssal protector",
-            "Tumeken's guardian",
-            "Muphin",
-            "Wisp",
-            "Baron",
-            "Butch",
-            "Lil'viathan",
-            "Scurry",
-            "Smol Heredit",
-            "Quetzin",
-            "Nid",
-            "Huberte",
-            "Moxi",
-            "Bran",
-            "Yami",
-            "Dom",
-            "Gull",
-            "Soup",
-            "Beef",
-          ];
-          const idToPetName: { [id: number]: string } = {};
-          petIdOrder.forEach((id, idx) => {
-            idToPetName[id] = petOrder[idx];
-          });
-
           // Initialize all pets to 0 (not obtained)
           const pets: { [key: string]: number } = {};
-          petOrder.forEach((name) => {
+          PET_ORDER.forEach((name) => {
             pets[name] = 0;
           });
 
           // Set obtained pets from API response
           allPets.forEach((pet: any) => {
-            const petName = idToPetName[pet.id];
+            const petName = PET_ID_TO_NAME[pet.id];
             if (petName) pets[petName] = pet.count >= 1 ? 1 : 0;
           });
 

@@ -73,3 +73,4 @@ export { default as Dom } from "./Dom.png";
 export { default as Soup } from "./Soup.png";
 export { default as Gull } from "./Gull.png";
 export { default as Beef } from "./Beef.png";
+export { default as MaggotMarquess } from "./Maggot marquess.png";
